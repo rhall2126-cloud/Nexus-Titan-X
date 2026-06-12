@@ -129,6 +129,14 @@ var liveStocksOk = false;
 var lastLiveUpdate = null;
 var liveTimer = null;
 var LIVE_CORE_SYMS = ['TSLA','AAPL','NVDA','MSFT','AMZN','META','GOOGL','NFLX','AMD','SPY','QQQ'];
+var liveProfiles = {};   // SYM -> fetched company profile
+var profileFetching = {}; // in-flight guard
+var TICKER_ALIASES = {'S&P':'SPY','SP500':'SPY','S&P500':'SPY','SPX':'SPY','NASDAQ':'QQQ','NDX':'QQQ','DOW':'DIA','DOWJONES':'DIA','RUSSELL':'IWM','BITCOIN':'BTC','ETHEREUM':'ETH','SOLANA':'SOL','GOLD':'GLD','OIL':'USO','VIX':'VIXY'};
+function resolveTicker(s){
+  s=(s||'').toUpperCase().trim();
+  var key=s.replace(/[^A-Z0-9&]/g,'');
+  return TICKER_ALIASES[key]||TICKER_ALIASES[s]||s;
+}
 var COINGECKO_IDS = {BTC:'bitcoin',ETH:'ethereum',BNB:'binancecoin',SOL:'solana',BCH:'bitcoin-cash',LTC:'litecoin',INJ:'injective-protocol',TIA:'celestia',AXS:'axie-infinity',LINK:'chainlink',AVAX:'avalanche-2',LDO:'lido-dao',WIF:'dogwifcoin',UNI:'uniswap',OP:'optimism',ICP:'internet-computer',NEAR:'near',IMX:'immutable-x',ATOM:'cosmos',SUI:'sui',APE:'apecoin',ARB:'arbitrum',XRP:'ripple',STRK:'starknet',DOT:'polkadot',JUP:'jupiter-exchange-solana',FIL:'filecoin',SEI:'sei-network',PYTH:'pyth-network',SAND:'the-sandbox',ADA:'cardano',ALGO:'algorand',DOGE:'dogecoin',CHZ:'chiliz',HBAR:'hedera-hashgraph',MATIC:'polygon-ecosystem-token',MANA:'decentraland',PEPE:'pepe',SHIB:'shiba-inu'};
 // AutoTrader bot states (real toggles)
 var autoBots = [
@@ -339,6 +347,38 @@ function fetchStooqQuotes(syms){
 function fetchFreeStockQuotes(syms){
   // chain: Yahoo first (real-time-ish), Stooq fallback (EOD) — both 100% keyless
   return fetchYahooQuotes(syms).then(function(ok){ return ok ? true : fetchStooqQuotes(syms); });
+}
+// ===== FREE COMPANY PROFILE FETCHER (keyless Yahoo, Finnhub upgrade if key saved) =====
+function fetchCompanyProfile(sym){
+  sym=resolveTicker(sym);
+  if(liveProfiles[sym] || profileFetching[sym] || typeof fetch==='undefined') return Promise.resolve(liveProfiles[sym]||null);
+  profileFetching[sym]=true;
+  function done(p){ delete profileFetching[sym]; if(p){ liveProfiles[sym]=p; if(activeTab==='symbol-detail') renderActiveTab(); } return p; }
+  // 1) Finnhub profile if user saved a key (best quality)
+  var key=apiKeys['finnhub'];
+  var finnhubTry = key
+    ? fetch('https://finnhub.io/api/v1/stock/profile2?symbol='+encodeURIComponent(sym)+'&token='+encodeURIComponent(key))
+        .then(function(r){ return r.json(); })
+        .then(function(d){ if(d&&d.name){ return {src:'Finnhub',name:d.name,industry:d.finnhubIndustry||'—',exchange:d.exchange||'—',country:d.country||'—',ipo:d.ipo||'—',cap:d.marketCapitalization?('$'+(d.marketCapitalization/1000).toFixed(2)+'B'):'—',shares:d.shareOutstanding?(d.shareOutstanding.toFixed(1)+'M'):'—',web:d.weburl||'',logo:d.logo||'',summary:d.name+' operates in the '+(d.finnhubIndustry||'listed')+' industry, listed on '+(d.exchange||'a US exchange')+' since '+(d.ipo||'its IPO')+'.'}; } return null; })
+        .catch(function(){ return null; })
+    : Promise.resolve(null);
+  return finnhubTry.then(function(p){
+    if(p) return done(p);
+    // 2) FREE keyless Yahoo quoteSummary (assetProfile) via CORS mirrors
+    var target='https://query1.finance.yahoo.com/v10/finance/quoteSummary/'+encodeURIComponent(sym)+'?modules=assetProfile%2Cprice';
+    var urls=['https://api.allorigins.win/raw?url='+encodeURIComponent(target),'https://corsproxy.io/?url='+encodeURIComponent(target),target];
+    function tryUrl(i){
+      if(i>=urls.length) return Promise.resolve(null);
+      return fetch(urls[i]).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(d){
+        var res=d&&d.quoteSummary&&d.quoteSummary.result&&d.quoteSummary.result[0];
+        if(!res) throw 0;
+        var ap=res.assetProfile||{}, pr=res.price||{};
+        if(!ap.longBusinessSummary && !pr.longName) throw 0;
+        return {src:'Yahoo Finance (free)',name:pr.longName||pr.shortName||sym,industry:ap.industry||'—',sector:ap.sector||'—',exchange:pr.exchangeName||'—',country:ap.country||'—',employees:ap.fullTimeEmployees?ap.fullTimeEmployees.toLocaleString():'—',city:(ap.city?ap.city+', ':'')+(ap.state||ap.country||''),web:ap.website||'',summary:(ap.longBusinessSummary||'').slice(0,900)||(pr.longName+' — profile summary unavailable on the free feed.')};
+      }).catch(function(){ return tryUrl(i+1); });
+    }
+    return tryUrl(0).then(done);
+  });
 }
 function fetchCryptoQuotes(){
   if(typeof fetch==='undefined') return Promise.resolve(false);
@@ -1386,7 +1426,7 @@ function initTabScripts(t){
   if(t==='premarket') drawCandleChart('pm-live-canvas', 738, true, {});
   if(t==='correlation') drawCandleChart('corr-live-canvas', 738, true, {});
   if(t==='ai-chart'){ drawCandleChart('ai-chart-canvas', Math.round(+getSym(currentAiChartSymbol).price)||144, true, {crypto:isCryptoSym(currentAiChartSymbol)}); if(document.getElementById('ai-opt-payoff')) drawPayoffCurve('ai-opt-payoff', aiOptLegs()); }
-  if(t==='symbol-detail') drawCandleChart('symdetail-chart', Math.round(+getSym(currentSymbol).price)||100, true, {crypto:isCryptoSym(currentSymbol)});
+  if(t==='symbol-detail'){ drawCandleChart('symdetail-chart', Math.round(+getSym(currentSymbol).price)||100, true, {crypto:isCryptoSym(currentSymbol)}); if(activeSymbolSub==='profile' && !liveProfiles[resolveTicker(currentSymbol)]) fetchCompanyProfile(currentSymbol); }
   if(t==='sessions'){ var spnl=paperPnl(); drawGauge('session-pnl-gauge', Math.max(-200,Math.min(500,spnl)), -200, 500, {zones:GAUGE_PNL_ZONES, valueText:(spnl>=0?'+$':'-$')+Math.abs(spnl), valueColor:spnl>=0?'#10b981':'#ef4444', label:'Daily P&L', minLabel:'-$200', maxLabel:'+$500'}); }
   if(t==='crypto-dash') drawGauge('cdash-fg-gauge', 12, 0, 100, {zones:GAUGE_FG_ZONES, valueText:'12', valueColor:'#ef4444', label:'Extreme Fear', minLabel:0, maxLabel:100});
   if(t==='onchain'){
@@ -1680,7 +1720,25 @@ function tabSymbolDetail(){
       +panel('Valuation',row2('Market Cap',s.cap)+row2('P/E Ratio',s.pe||'N/A')+row2('EPS (TTM)','$'+s.eps)+row2('Debt / Equity',s.de)+'<button onclick="switchTab(\'valuation\')" class="w-full bg-accent/20 hover:bg-accent/30 border border-accent/25 text-accent text-xs font-bold py-2 rounded-xl mt-3 transition-all">📊 Open Full Valuation Workspace →</button>')
       +panel('Liquidity Structure',row2('Float',s.float)+row2('Short Interest',s.si,'text-gray-400','text-gold')+row2('Avg Volume',s.vol)+row2('ATR (14)',s.atr))+'</div>';
   } else if(activeSymbolSub==='profile'){
-    h+=panel('Company Profile — '+s.name,'<p class="text-xs text-gray-300 font-semibold leading-relaxed">'+s.desc+'</p><p class="text-[10px] text-gray-500 mt-2 italic">Full institutional profile loads with a connected data key (Settings → Data Sources).</p>');
+    var rsym=resolveTicker(currentSymbol);
+    var prof=liveProfiles[rsym];
+    var aliased = rsym!==currentSymbol.toUpperCase().replace(/[^A-Z0-9&.]/g,'');
+    if(prof){
+      h+=panel('Company Profile — '+prof.name+' '+badge('LIVE · '+prof.src,'bg-success/15 text-success'),
+        '<p class="text-xs text-gray-300 font-semibold leading-relaxed">'+prof.summary+'</p>'
+        +'<div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3">'
+        +[['Sector',prof.sector||prof.industry],['Industry',prof.industry],['Exchange',prof.exchange],['Country',prof.country],['Employees',prof.employees||prof.shares||'—'],['HQ / IPO',prof.city||prof.ipo||'—']].map(function(x){return '<div class="bg-dark/40 border border-gray-850 rounded-lg p-2"><span class="text-[8px] text-gray-500 font-black uppercase block">'+x[0]+'</span><span class="text-[11px] text-white font-bold">'+(x[1]||'—')+'</span></div>';}).join('')
+        +'</div>'+(prof.web?'<p class="text-[10px] text-accent font-bold mt-2 font-mono">🔗 '+prof.web+'</p>':''));
+    } else {
+      var isProperTicker=/^[A-Z]{1,5}(\.[A-Z])?$/.test(rsym);
+      h+=panel('Company Profile — '+s.name,
+        (aliased?infoBox('💡 "'+currentSymbol+'" ISN\u2019T A STOCK TICKER','"'+currentSymbol+'" looks like an index/asset name, not a tradable symbol — so the app generated placeholder data. I\u2019ve mapped it to the closest tradable ETF: <b class="text-white">'+rsym+'</b>. Press Fetch below, or search a real ticker like AAPL, TSLA, NVDA.','border-gold/25')+'<div class="mt-3"></div>':'')
+        +'<p class="text-xs text-gray-300 font-semibold leading-relaxed">'+s.desc+'</p>'
+        +'<div class="mt-3 p-3 bg-dark/40 border border-accent/20 rounded-xl"><span class="text-[9px] text-accent font-black uppercase block mb-1">📡 GET THE REAL PROFILE — NO KEY NEEDED</span>'
+        +'<p class="text-[10px] text-gray-400 font-semibold leading-relaxed mb-2">You aren\u2019t missing any key. The full profile (business summary, sector, industry, HQ, employees) streams FREE from Yahoo Finance. A saved Finnhub key (Settings → Data Sources) upgrades it, but it\u2019s optional.</p>'
+        +'<button onclick="playSound(\'alert\');fetchCompanyProfile(\''+rsym+'\').then(function(p){ if(!p){ playSound(\'loss\'); alert(\'✗ No profile found for '+rsym+'. Check the ticker spelling — indices (S&P, NDX) and crypto don\u2019t have company profiles; use their ETFs (SPY, QQQ) instead.\'); } })" class="bg-accent hover:bg-accentHover text-white text-xs font-black px-4 py-2 rounded-xl transition-all">📡 Fetch Live Profile'+(aliased?' for '+rsym:'')+'</button>'
+        +(isProperTicker?'':'<p class="text-[9px] text-gold font-bold mt-2">⚠ "'+rsym+'" doesn\u2019t look like a valid US ticker (1-5 letters). Profiles only exist for real listed companies.</p>')+'</div>');
+    }
   } else {
     h+=panel('Latest Headlines — '+currentSymbol,
       [['2h ago',currentSymbol+' surges on heavy relative volume; scanners flag momentum ignition'],['5h ago','Analysts revisit price targets following sector rotation into '+(s.name.split(' ')[0])],['1d ago','Options flow shows elevated call sweep activity at near-the-money strikes'],['2d ago','Institutional 13F filings reveal quarter-over-quarter position changes']].map(function(n){return '<div class="py-2 border-b border-gray-850"><span class="text-[9px] text-gray-500 font-mono font-bold">'+n[0]+'</span><p class="text-xs text-gray-300 font-semibold">'+n[1]+'</p></div>';}).join(''));
