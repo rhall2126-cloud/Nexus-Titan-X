@@ -1262,7 +1262,7 @@ function renderTab(t){
 function initTabScripts(t){
   if(t==='home') drawCandleChart('home-chart', 242, true);
   if(t==='all-in-one') drawCandleChart('aio-chart', Math.round(getSym(currentSymbol).price)||242, true);
-  if(t==='ai-chart') drawCandleChart('ai-chart-canvas', Math.round(getSym(currentAiChartSymbol).price)||144, true);
+  if(t==='ai-chart'){ drawCandleChart('ai-chart-canvas', Math.round(getSym(currentAiChartSymbol).price)||144, true); if(document.getElementById('ai-opt-payoff')) drawPayoffCurve('ai-opt-payoff', aiOptLegs()); }
   if(t==='symbol-detail') drawCandleChart('symdetail-chart', Math.round(getSym(currentSymbol).price)||100, true);
   if(t==='valuation'){
     var V=getVal(currentSymbol);
@@ -1747,6 +1747,106 @@ function tabPremarket(){
   return h;
 }
 
+// ---------- AI CHART OPTIONS DESK ENGINE ----------
+var aiOptStrategy='Iron Condor 🦅';
+var aiOptDTE=30;
+var aiOptIV=25;
+var aiOptShift=0;
+var aiOptCustomLegs=[];
+var AI_OPT_STRATS=['Long Call 📈','Long Put 📉','Naked Call','Cash-Secured Put','Bull Call Spread','Bear Put Spread','Straddle ↕️','Strangle','Iron Condor 🦅','Covered Call'];
+function optStep(P){ return P<2?0.1:P<5?0.25:P<25?1:P<100?2.5:P<250?5:P<600?10:25; }
+function optPrem(P,K,type,iv,dte){
+  var intrinsic = type==='CALL'? Math.max(P-K,0): Math.max(K-P,0);
+  var sd = P*(iv/100)*Math.sqrt(dte/365)+0.0001;
+  var dist = Math.abs(P-K)/sd;
+  var tv = (sd*0.8)*Math.exp(-0.5*dist*dist);
+  return Math.max(0.01, intrinsic+tv);
+}
+function optDelta(P,K,type,iv,dte){
+  var sd=P*(iv/100)*Math.sqrt(dte/365)+0.0001;
+  var nd=1/(1+Math.exp(-1.7*(P-K)/sd));
+  return type==='CALL'? nd : nd-1;
+}
+function aiOptLegs(){
+  var P=+getSym(currentAiChartSymbol).price;
+  var st=optStep(P), atm=Math.round(P/st)*st + aiOptShift*st;
+  var S=aiOptStrategy, L=[];
+  function leg(q,t,off){ L.push({qty:q,type:t,strike:+( atm+off*st ).toFixed(2)}); }
+  if(S.indexOf('Long Call')===0) leg(1,'CALL',0);
+  else if(S.indexOf('Long Put')===0) leg(1,'PUT',0);
+  else if(S==='Naked Call') leg(-1,'CALL',1);
+  else if(S==='Cash-Secured Put') leg(-1,'PUT',-1);
+  else if(S==='Bull Call Spread'){ leg(1,'CALL',0); leg(-1,'CALL',2); }
+  else if(S==='Bear Put Spread'){ leg(1,'PUT',0); leg(-1,'PUT',-2); }
+  else if(S.indexOf('Straddle')===0){ leg(1,'CALL',0); leg(1,'PUT',0); }
+  else if(S==='Strangle'){ leg(1,'CALL',2); leg(1,'PUT',-2); }
+  else if(S.indexOf('Iron Condor')===0){ leg(1,'PUT',-3); leg(-1,'PUT',-2); leg(-1,'CALL',2); leg(1,'CALL',3); }
+  else if(S==='Covered Call'){ L.push({qty:1,type:'STOCK',strike:+P.toFixed(2)}); leg(-1,'CALL',2); }
+  return L.concat(aiOptCustomLegs);
+}
+function aiOptStats(legs){
+  var P=+getSym(currentAiChartSymbol).price, net=0;
+  legs.forEach(function(l){ if(l.type!=='STOCK') net += l.qty*optPrem(P,l.strike,l.type,aiOptIV,aiOptDTE); });
+  function payoff(S){
+    var v=-net;
+    legs.forEach(function(l){
+      if(l.type==='STOCK'){ v += (S-l.strike)*l.qty; return; }
+      v += l.qty*(l.type==='CALL'? Math.max(S-l.strike,0): Math.max(l.strike-S,0));
+    });
+    return v;
+  }
+  var maxP=-1e15,minP=1e15;
+  for(var s=P*0.4;s<=P*1.6;s+=Math.max(0.01,P*0.005)){ var v=payoff(s); if(v>maxP)maxP=v; if(v<minP)minP=v; }
+  var unlUp = payoff(P*1.6)-payoff(P*1.55) > 0.001;
+  var unlDn = payoff(P*0.4)-payoff(P*0.45) > 0.001;
+  var be=[]; var prev=payoff(P*0.4);
+  for(var s2=P*0.4+P*0.005;s2<=P*1.6;s2+=Math.max(0.01,P*0.005)){ var cur=payoff(s2); if((prev<0&&cur>=0)||(prev>0&&cur<=0)) be.push(s2); prev=cur; }
+  return {net:net,maxP:maxP,minP:minP,unl:unlUp||unlDn,be:be,payoff:payoff};
+}
+function aiOptPick(s){ aiOptStrategy=s; aiOptCustomLegs=[]; aiOptShift=0; playSound('fill'); renderActiveTab(); }
+function aiOptAddLeg(type,strike){
+  aiOptCustomLegs.push({qty:1,type:type,strike:+strike});
+  playSound('win');
+  notifLog.unshift('['+new Date().toLocaleTimeString()+'] ⊕ Added +1 '+type+' $'+strike+' to '+currentAiChartSymbol+' position');
+  renderActiveTab();
+}
+function aiOptRemoveLeg(i){ aiOptCustomLegs.splice(i,1); playSound('loss'); renderActiveTab(); }
+function aiOptQty(idx,delta){
+  var legs=aiOptLegs(); var base=legs.length-aiOptCustomLegs.length;
+  if(idx>=base){ var cl=aiOptCustomLegs[idx-base]; cl.qty+=delta; if(cl.qty===0) aiOptCustomLegs.splice(idx-base,1); playSound('fill'); renderActiveTab(); }
+  else { aiOptShift+=delta; playSound('fill'); renderActiveTab(); }
+}
+function drawPayoffCurve(canvasId, legs){
+  var c=document.getElementById(canvasId); if(!c) return;
+  var w=c.width=c.offsetWidth||500, h=c.height=c.offsetHeight||160;
+  var ctx=c.getContext('2d'); ctx.fillStyle='#0a0b0f'; ctx.fillRect(0,0,w,h);
+  var P=+getSym(currentAiChartSymbol).price;
+  var st=aiOptStats(legs);
+  var lo=P*0.7, hi=P*1.3, n=120;
+  var vals=[]; for(var i=0;i<=n;i++){ vals.push(st.payoff(lo+(hi-lo)*i/n)); }
+  var vmax=Math.max.apply(null,vals), vmin=Math.min.apply(null,vals);
+  if(vmax===vmin){ vmax+=1; vmin-=1; }
+  var pad=(vmax-vmin)*0.15; vmax+=pad; vmin-=pad;
+  function Y(v){ return h-(v-vmin)/(vmax-vmin)*h; }
+  var zy=Y(0);
+  ctx.strokeStyle='#374151'; ctx.beginPath(); ctx.moveTo(0,zy); ctx.lineTo(w,zy); ctx.stroke();
+  // profit/loss fills
+  ctx.beginPath(); ctx.moveTo(0,zy);
+  for(var j=0;j<=n;j++){ ctx.lineTo(j/n*w, Y(vals[j])); }
+  ctx.lineTo(w,zy); ctx.closePath();
+  ctx.save(); ctx.clip();
+  ctx.fillStyle='rgba(16,185,129,0.18)'; ctx.fillRect(0,0,w,zy);
+  ctx.fillStyle='rgba(239,68,68,0.15)'; ctx.fillRect(0,zy,w,h-zy);
+  ctx.restore();
+  ctx.beginPath();
+  for(var k=0;k<=n;k++){ var x=k/n*w, y=Y(vals[k]); if(k===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+  ctx.strokeStyle='#10b981'; ctx.lineWidth=2; ctx.stroke();
+  // spot marker
+  var sx=(P-lo)/(hi-lo)*w;
+  ctx.strokeStyle='#7c3aed'; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(sx,0); ctx.lineTo(sx,h); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#7c3aed'; ctx.font='8px monospace'; ctx.fillText('SPOT $'+P.toFixed(2), Math.min(sx+4,w-70), 12);
+}
+
 // ---------- AI CHART ----------
 function tabAiChart(){
   var s=getSym(currentAiChartSymbol);
@@ -1776,14 +1876,49 @@ function tabAiChart(){
   h+=panel('📡 Buy & Sell Signals','<div class="grid grid-cols-1 gap-3">'
     +'<div class="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl"><span class="text-[9px] text-success font-black uppercase block mb-1">✅ BUY SIGNALS</span><div class="space-y-1 text-[11px] text-gray-300 font-semibold">'+['ORB breakout with 2× volume','VWAP reclaim on pullback','Bull flag 5m close','Power hour surge'].map(function(x){return '<div>✓ '+x+'</div>';}).join('')+'</div></div>'
     +'<div class="p-3 bg-red-500/5 border border-red-500/10 rounded-xl"><span class="text-[9px] text-danger font-black uppercase block mb-1">🔴 EXIT / AVOID</span><div class="space-y-1 text-[11px] text-gray-300 font-semibold">'+['Double top near HOD','Volume drying up','VWAP loss on volume','Close below 9 EMA'].map(function(x){return '<div>✗ '+x+'</div>';}).join('')+'</div></div></div>');
-  h+='<div class="lg:col-span-2">'+panel(currentAiChartSymbol+' Options Desk — IV Rank 25 — 30 DTE',
-    '<div class="flex gap-1.5 overflow-x-auto pb-2">'+['Long Call 📈','Long Put 📉','Naked Call','Cash-Secured Put','Bull Call Spread','Bear Put Spread','Straddle ↕️','Strangle','Iron Condor 🦅','Covered Call'].map(function(st){return '<button onclick="playSound(\'fill\')" class="px-3 py-1.5 rounded-full text-[10px] font-bold whitespace-nowrap bg-dark/40 border border-gray-800 text-gray-400 hover:text-white hover:border-accent transition-all">'+st+'</button>';}).join('')+'</div>'
-    +'<div class="p-3 bg-dark/30 border border-gray-850 rounded-xl mb-3"><span class="text-[9px] text-gray-500 font-black uppercase block mb-2">Position Legs</span><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] font-mono">'
-    +[['-1 PUT','$1','text-danger'],['+1 PUT','$1','text-success'],['-1 CALL','$2','text-danger'],['+1 CALL','$2','text-success']].map(function(l){return '<div class="p-2 bg-panel rounded-lg border border-gray-850"><span class="'+l[2]+' font-bold block">'+l[0]+' 30d</span><span class="text-gray-500">Strike '+l[1]+' · Δ 0.000 θ 0.000</span></div>';}).join('')
-    +'</div><div class="flex justify-between mt-2 text-[10px] text-gray-400 font-mono"><span>NET DEBIT: <b class="text-white">$0.00</b>/contract</span><span>MAX PROFIT: <b class="text-success">$100</b></span></div></div>'
-    +'<div class="text-[10px] font-mono"><div class="grid grid-cols-9 text-gray-500 font-bold text-center border-b border-gray-850 pb-1 uppercase text-[8px]"><span class="col-span-2">Bid</span><span>Ask</span><span>Delta</span><span class="text-accent">Strike</span><span>Bid</span><span>Ask</span><span>Delta</span><span>IV</span></div>'
-    +[[0.44,0.45,'1.00',1,0.00,0.01,'0.00'],[0.00,0.01,'0.00',2,0.55,0.56,'1.00']].map(function(r){return '<div class="grid grid-cols-9 text-center py-1.5 border-b border-gray-850/50 hover:bg-dark/40 cursor-pointer" onclick="playSound(\'fill\')"><span class="col-span-2 text-success font-semibold">'+r[0].toFixed(2)+'</span><span class="text-success font-semibold">'+r[1].toFixed(2)+'</span><span>'+r[2]+'</span><span class="text-white font-bold bg-panel border border-gray-850 rounded">'+r[3]+'</span><span class="text-danger font-semibold">'+r[4].toFixed(2)+'</span><span class="text-danger font-semibold">'+r[5].toFixed(2)+'</span><span>'+r[6]+'</span><span class="text-gray-500">25%</span></div>';}).join('')
-    +'<p class="text-[9px] text-gray-500 mt-2 italic">Click any strike to add a leg · adjust with +/- · IV and DTE sliders in Options Analysis Mode</p></div>')+'</div></div>';
+  h+='<div class="lg:col-span-2">'+(function(){
+    var P=+getSym(currentAiChartSymbol).price;
+    var legs=aiOptLegs();
+    var st=aiOptStats(legs);
+    var step=optStep(P), atm=Math.round(P/step)*step;
+    // strategy selector chips (ACTIVE state + real handler)
+    var chipsHTML='<div class="flex gap-1.5 overflow-x-auto pb-2">'+AI_OPT_STRATS.map(function(s){
+      return '<button onclick="aiOptPick(\''+s.replace(/'/g,"\\'")+'\')" class="px-3 py-1.5 rounded-full text-[10px] font-bold whitespace-nowrap transition-all '+(aiOptStrategy===s?'bg-accent border border-accent text-white shadow-md shadow-accent/20':'bg-dark/40 border border-gray-800 text-gray-400 hover:text-white hover:border-accent')+'">'+s+'</button>';
+    }).join('')+'</div>';
+    // IV / DTE sliders
+    var slidersHTML='<div class="flex flex-wrap items-center gap-4 mb-3 text-[9px] font-bold"><div><span class="text-gray-500 uppercase block mb-1">IV Rank: <b class="text-gold">'+aiOptIV+'</b></span><input type="range" min="5" max="100" value="'+aiOptIV+'" oninput="aiOptIV=+this.value;renderActiveTab()" class="w-28"></div><div><span class="text-gray-500 uppercase block mb-1">DTE: <b class="text-accent">'+aiOptDTE+'d</b></span><input type="range" min="1" max="90" value="'+aiOptDTE+'" oninput="aiOptDTE=+this.value;renderActiveTab()" class="w-28"></div><div class="ml-auto text-right"><span class="text-gray-500 uppercase block">Spot</span><span class="text-white font-black font-mono text-xs">$'+P.toFixed(2)+'</span></div></div>';
+    // position legs (live computed)
+    var legsHTML='<div class="p-3 bg-dark/30 border border-gray-850 rounded-xl mb-3"><div class="flex justify-between items-center mb-2"><span class="text-[9px] text-gray-500 font-black uppercase">Position Legs — '+aiOptStrategy+'</span>'+(aiOptShift!==0||aiOptCustomLegs.length?'<button onclick="aiOptShift=0;aiOptCustomLegs=[];playSound(\'loss\');renderActiveTab()" class="text-[9px] text-gray-600 hover:text-danger font-bold">Reset</button>':'')+'</div><div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] font-mono">'
+      +legs.map(function(l,i){
+        var prem=l.type==='STOCK'?0:optPrem(P,l.strike,l.type,aiOptIV,aiOptDTE);
+        var dlt=l.type==='STOCK'?1:optDelta(P,l.strike,l.type,aiOptIV,aiOptDTE);
+        var isCustom=i>=legs.length-aiOptCustomLegs.length;
+        return '<div class="p-2 bg-panel rounded-lg border '+(isCustom?'border-accent/30':'border-gray-850')+'"><div class="flex justify-between items-start"><span class="'+(l.qty>0?'text-success':'text-danger')+' font-bold">'+(l.qty>0?'+':'')+l.qty+' '+l.type+(l.type!=='STOCK'?' '+aiOptDTE+'d':'')+'</span><div class="flex gap-0.5"><button onclick="aiOptQty('+i+',-1)" class="w-4 h-4 bg-dark border border-gray-800 rounded text-gray-400 text-[9px] hover:text-white leading-none">-</button><button onclick="aiOptQty('+i+',1)" class="w-4 h-4 bg-dark border border-gray-800 rounded text-gray-400 text-[9px] hover:text-white leading-none">+</button>'+(isCustom?'<button onclick="aiOptRemoveLeg('+(i-(legs.length-aiOptCustomLegs.length))+')" class="w-4 h-4 bg-dark border border-red-900/40 rounded text-red-400 text-[9px] leading-none">x</button>':'')+'</div></div><span class="text-gray-500 block mt-0.5">Strike $'+l.strike+(l.type!=='STOCK'?' · Prem $'+prem.toFixed(2):'')+'</span><span class="text-gray-600 text-[9px]">Δ '+dlt.toFixed(3)+(l.type!=='STOCK'?' θ -'+(prem/Math.max(1,aiOptDTE)).toFixed(3):'')+'</span></div>';
+      }).join('')
+      +'</div><div class="flex flex-wrap justify-between gap-2 mt-2 text-[10px] text-gray-400 font-mono"><span>NET '+(st.net>=0?'DEBIT':'CREDIT')+': <b class="'+(st.net>=0?'text-danger':'text-success')+'">$'+Math.abs(st.net*100).toFixed(0)+'</b>/contract</span><span>MAX PROFIT: <b class="text-success">'+(st.unl&&st.maxP>P?'UNLIMITED':'$'+Math.max(0,st.maxP*100).toFixed(0))+'</b></span><span>MAX LOSS: <b class="text-danger">$'+Math.abs(Math.min(0,st.minP)*100).toFixed(0)+'</b></span>'+(st.be.length?'<span>BREAKEVEN: <b class="text-gold">'+st.be.map(function(b){return '$'+b.toFixed(2);}).join(' / ')+'</b></span>':'')+'</div></div>';
+    // payoff curve
+    var curveHTML='<div class="h-[140px] relative mb-3"><canvas id="ai-opt-payoff" class="absolute inset-0 w-full h-full rounded-xl"></canvas></div>';
+    // live chain rows around ATM — clickable to add legs
+    var rows='';
+    for(var off=4;off>=-4;off--){
+      var K=+(atm+off*step).toFixed(2);
+      var cp=optPrem(P,K,'CALL',aiOptIV,aiOptDTE), pp=optPrem(P,K,'PUT',aiOptIV,aiOptDTE);
+      var cd=optDelta(P,K,'CALL',aiOptIV,aiOptDTE), pd=optDelta(P,K,'PUT',aiOptIV,aiOptDTE);
+      var isATM=Math.abs(K-atm)<0.001;
+      rows+='<div class="grid grid-cols-9 text-center py-1.5 border-b border-gray-850/50 '+(isATM?'bg-accent/5':'')+'">'
+        +'<button onclick="aiOptAddLeg(\'CALL\','+K+')" class="col-span-2 text-success font-semibold hover:bg-success/10 rounded transition-all" title="Click to add +1 CALL $'+K+'">'+cp.toFixed(2)+'</button>'
+        +'<span class="text-success/70">'+(cp+step*0.01).toFixed(2)+'</span>'
+        +'<span class="text-gray-400">'+cd.toFixed(2)+'</span>'
+        +'<span class="text-white font-bold '+(isATM?'bg-accent/20 border border-accent/40':'bg-panel border border-gray-850')+' rounded">'+K+'</span>'
+        +'<button onclick="aiOptAddLeg(\'PUT\','+K+')" class="text-danger font-semibold hover:bg-red-500/10 rounded transition-all" title="Click to add +1 PUT $'+K+'">'+pp.toFixed(2)+'</button>'
+        +'<span class="text-danger/70">'+(pp+step*0.01).toFixed(2)+'</span>'
+        +'<span class="text-gray-400">'+pd.toFixed(2)+'</span>'
+        +'<span class="text-gray-500">'+aiOptIV+'%</span></div>';
+    }
+    var chainHTML='<div class="text-[10px] font-mono"><div class="grid grid-cols-9 text-gray-500 font-bold text-center border-b border-gray-850 pb-1 uppercase text-[8px]"><span class="col-span-2">Call Bid</span><span>Ask</span><span>Delta</span><span class="text-accent">Strike</span><span>Put Bid</span><span>Ask</span><span>Delta</span><span>IV</span></div>'+rows
+      +'<p class="text-[9px] text-gray-500 mt-2 italic">✓ Click any strategy chip to load its legs · click a Call/Put bid to ADD that leg · +/- adjusts quantity or shifts strikes · IV and DTE sliders reprice everything live</p></div>';
+    return panel(currentAiChartSymbol+' Options Desk — IV Rank '+aiOptIV+' — '+aiOptDTE+' DTE', chipsHTML+slidersHTML+legsHTML+curveHTML+chainHTML);
+  })()+'</div></div>';
   return h;
 }
 function aiChartGo(){ var v=document.getElementById('ai-chart-search').value; if(v){ currentAiChartSymbol=v.toUpperCase().trim(); renderActiveTab(); } }
@@ -3083,5 +3218,5 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0a5f6304d28f5fe',t:'MTc4MTIzNjk2Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
