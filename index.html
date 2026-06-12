@@ -1728,7 +1728,14 @@ function tabSymbolDetail(){
         '<p class="text-xs text-gray-300 font-semibold leading-relaxed">'+prof.summary+'</p>'
         +'<div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3">'
         +[['Sector',prof.sector||prof.industry],['Industry',prof.industry],['Exchange',prof.exchange],['Country',prof.country],['Employees',prof.employees||prof.shares||'—'],['HQ / IPO',prof.city||prof.ipo||'—']].map(function(x){return '<div class="bg-dark/40 border border-gray-850 rounded-lg p-2"><span class="text-[8px] text-gray-500 font-black uppercase block">'+x[0]+'</span><span class="text-[11px] text-white font-bold">'+(x[1]||'—')+'</span></div>';}).join('')
-        +'</div>'+(prof.web?'<p class="text-[10px] text-accent font-bold mt-2 font-mono">🔗 '+prof.web+'</p>':''));
+        +'</div>'+(prof.web?(function(){
+          var url=(''+prof.web).trim();
+          if(url && !/^https?:\/\//i.test(url)) url='https://'+url;
+          var display=url.replace(/^https?:\/\//i,'').replace(/\/$/,'');
+          var safe=/^https:\/\/[A-Za-z0-9][A-Za-z0-9.\-]*(\/[^"'<>\s]*)?$/.test(url)||/^http:\/\/[A-Za-z0-9][A-Za-z0-9.\-]*(\/[^"'<>\s]*)?$/.test(url);
+          if(!safe) return '<p class="text-[10px] text-gray-500 font-bold mt-2 font-mono">🔗 '+display+'</p>';
+          return '<a href="'+url+'" target="_blank" rel="noopener noreferrer" onclick="playSound(\'fill\')" class="inline-flex items-center gap-1.5 mt-2 bg-accent/15 hover:bg-accent/30 border border-accent/25 text-accent text-[10px] font-bold font-mono px-3 py-1.5 rounded-lg transition-all" title="Opens '+display+' in a new tab">🔗 '+display+' <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i></a>';
+        })():''));
     } else {
       var isProperTicker=/^[A-Z]{1,5}(\.[A-Z])?$/.test(rsym);
       h+=panel('Company Profile — '+s.name,
@@ -3426,6 +3433,6 @@ document.addEventListener('DOMContentLoaded', function(){
   startLiveEngine(); // pulls real quotes if keys exist; crypto streams keyless via CoinGecko
 });
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0ac3fb30f5ac5db',t:'MTc4MTMwMjg4OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
