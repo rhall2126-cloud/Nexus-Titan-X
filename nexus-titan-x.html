@@ -1,0 +1,2591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS TITAN X — Ultimate Trading OS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --bg:#0a0c12;
+  --panel:#11141d;
+  --panel-2:#161a25;
+  --dark:#0d1018;
+  --gray-800:#252a38;
+  --gray-700:#3a4055;
+  --accent:#8b5cf6;
+  --accent-hov:#7c3aed;
+  --success:#10b981;
+  --danger:#ef4444;
+  --gold:#f59e0b;
+  --info:#3b82f6;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:#e5e7eb;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;margin:0;overflow-x:hidden}
+.bg-panel{background:var(--panel)}
+.bg-panel-2{background:var(--panel-2)}
+.bg-dark{background:var(--dark)}
+.text-accent{color:var(--accent)}
+.bg-accent{background:var(--accent)}
+.bg-accent\/10{background:rgba(139,92,246,.10)}
+.bg-accent\/15{background:rgba(139,92,246,.15)}
+.bg-accent\/20{background:rgba(139,92,246,.20)}
+.text-success{color:var(--success)}
+.bg-success\/15{background:rgba(16,185,129,.15)}
+.bg-success\/20{background:rgba(16,185,129,.20)}
+.text-danger{color:var(--danger)}
+.bg-danger\/15{background:rgba(239,68,68,.15)}
+.bg-danger\/20{background:rgba(239,68,68,.20)}
+.text-gold{color:var(--gold)}
+.bg-gold\/10{background:rgba(245,158,11,.10)}
+.bg-gold\/15{background:rgba(245,158,11,.15)}
+.border-gray-800{border-color:#1f2330}
+.border-gray-700{border-color:#2a3040}
+.tab-btn.active{background:rgba(139,92,246,.15);color:#fff;border-left:3px solid var(--accent)}
+.tab-btn:hover{background:rgba(255,255,255,.04);color:#fff}
+.btn{padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid var(--gray-800)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-hov)}
+.btn-ghost{background:transparent;color:#9ca3af}
+.btn-ghost:hover{background:rgba(255,255,255,.05);color:#fff}
+.card{background:var(--panel);border:1px solid #1f2330;border-radius:14px;padding:18px}
+.input{background:var(--dark);border:1px solid #1f2330;border-radius:8px;padding:8px 12px;color:#fff;font-size:12px;width:100%}
+.input:focus{outline:none;border-color:var(--accent)}
+.scroll-y{overflow-y:auto}
+.scroll-y::-webkit-scrollbar{width:6px}
+.scroll-y::-webkit-scrollbar-thumb{background:#2a3040;border-radius:3px}
+.scroll-x{overflow-x:auto}
+.scroll-x::-webkit-scrollbar{height:6px}
+.scroll-x::-webkit-scrollbar-thumb{background:#2a3040;border-radius:3px}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-track{display:flex;animation:ticker 80s linear infinite;white-space:nowrap}
+.ticker-fast{animation:ticker 60s linear infinite}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 6px rgba(139,92,246,.4)}50%{box-shadow:0 0 14px rgba(139,92,246,.8)}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;animation:pulse-glow 1.6s infinite}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.kbd{background:var(--dark);border:1px solid #2a3040;border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:10px}
+.pro-chart-grid{display:grid;grid-template-rows:auto 1fr auto;height:100%;min-height:560px}
+.signal8-row{display:grid;grid-template-columns:1.5fr 2fr 2fr 1fr;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid #1f2330;font-size:12px}
+.signal8-row:hover{background:rgba(255,255,255,.03)}
+.indicator-cell{transition:all .15s;cursor:pointer}
+.indicator-cell:hover{background:rgba(139,92,246,.1)}
+.indicator-cell.selected{background:rgba(139,92,246,.18);color:#fff}
+.candle-svg{background:linear-gradient(180deg,#0d1018,#11141d)}
+.pattern-card{background:var(--panel-2);border:1px solid #1f2330;border-radius:12px;overflow:hidden;transition:all .2s}
+.pattern-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.pattern-svg-box{background:linear-gradient(180deg,#0a0c12,#11141d);padding:14px;display:flex;align-items:center;justify-content:center;min-height:120px}
+.indicator-tile{background:var(--panel-2);border:1px solid #1f2330;border-radius:10px;padding:10px;cursor:pointer;transition:all .15s}
+.indicator-tile:hover{border-color:var(--accent);background:rgba(139,92,246,.08)}
+.indicator-tile.active{background:rgba(139,92,246,.18);border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="bg-panel border-b border-gray-800 px-4 py-2.5 flex items-center gap-4 sticky top-0 z-50">
+  <div class="flex items-center gap-3">
+    <div class="w-9 h-9 rounded-lg bg-accent flex items-center justify-center">
+      <i class="fa-solid fa-chart-line text-white text-sm"></i>
+    </div>
+    <div>
+      <div class="text-sm font-black tracking-tight">NEXUS <span class="text-accent">TITAN X</span></div>
+      <div class="text-[9px] text-gray-500 uppercase tracking-wider font-bold">Institutional Trading OS · v9.0</div>
+    </div>
+  </div>
+  <div class="flex-1 max-w-xl mx-4">
+    <div class="relative">
+      <i class="fa-solid fa-search absolute left-3 top-2.5 text-gray-500 text-xs"></i>
+      <input id="globalSearch" type="text" placeholder="Search symbol (AAPL, BTC, NVDA...)" class="w-full bg-dark border border-gray-800 rounded-lg pl-9 pr-24 py-2 text-xs font-bold focus:outline-none focus:border-accent" onkeydown="if(event.key==='Enter'){doGlobalSearch()}">
+      <button onclick="doGlobalSearch()" class="absolute right-1.5 top-1.5 bg-accent hover:bg-accent-hov text-white text-[10px] px-3 py-1.5 rounded font-bold">Execute <i class="fa-solid fa-arrow-right ml-1"></i></button>
+    </div>
+  </div>
+  <div class="hidden lg:flex items-center gap-4 text-[10px] font-mono">
+    <div class="flex items-center gap-1.5"><span class="live-dot"></span><span class="text-success font-bold">LIVE</span></div>
+    <div class="text-gray-500">S&amp;P 500 <span class="text-white font-bold" id="hdSPX">7,394</span> <span class="text-success">+1.70%</span></div>
+    <div class="text-gray-500">NDX <span class="text-white font-bold">29,446</span> <span class="text-success">+3.38%</span></div>
+    <div class="text-gray-500">VIX <span class="text-white font-bold">19.44</span></div>
+    <div class="text-gray-500">BTC <span class="text-white font-bold">$63,388</span></div>
+  </div>
+  <div class="flex items-center gap-2">
+    <button class="btn btn-ghost" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i></button>
+    <button class="btn btn-primary"><i class="fa-solid fa-bell mr-1"></i>Alerts</button>
+  </div>
+</header>
+
+<!-- TOP TICKER -->
+<div class="bg-dark border-b border-gray-800 overflow-hidden">
+  <div class="ticker-track py-1.5 text-[10px] font-mono">
+    <span class="px-4"><span class="text-gray-500">S&amp;P 500</span> <span class="text-white font-bold">7,394.12</span> <span class="text-success font-bold">+1.70%</span></span>
+    <span class="px-4"><span class="text-gray-500">NDX</span> <span class="text-white font-bold">29,446.55</span> <span class="text-success font-bold">+3.38%</span></span>
+    <span class="px-4"><span class="text-gray-500">ES Futures</span> <span class="text-white font-bold">7,402.50</span> <span class="text-success">+0.13%</span></span>
+    <span class="px-4"><span class="text-gray-500">NQ Futures</span> <span class="text-white font-bold">29,455.25</span> <span class="text-success">+0.04%</span></span>
+    <span class="px-4"><span class="text-gray-500">BTC</span> <span class="text-white font-bold">$63,388</span> <span class="text-success">+2.40%</span></span>
+    <span class="px-4"><span class="text-gray-500">Gold</span> <span class="text-white font-bold">$4,222</span> <span class="text-success">+2.63%</span></span>
+    <span class="px-4"><span class="text-gray-500">Crude</span> <span class="text-white font-bold">$86.74</span> <span class="text-success">+1.85%</span></span>
+    <span class="px-4"><span class="text-gray-500">10Y Yield</span> <span class="text-white font-bold">4.32%</span></span>
+    <span class="px-4"><span class="text-gray-500">DXY</span> <span class="text-white font-bold">104.18</span> <span class="text-danger">-0.32%</span></span>
+    <!-- duplicate for seamless scroll -->
+    <span class="px-4"><span class="text-gray-500">S&amp;P 500</span> <span class="text-white font-bold">7,394.12</span> <span class="text-success font-bold">+1.70%</span></span>
+    <span class="px-4"><span class="text-gray-500">NDX</span> <span class="text-white font-bold">29,446.55</span> <span class="text-success font-bold">+3.38%</span></span>
+    <span class="px-4"><span class="text-gray-500">BTC</span> <span class="text-white font-bold">$63,388</span> <span class="text-success">+2.40%</span></span>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="flex" style="height: calc(100vh - 90px);">
+
+  <!-- SIDEBAR -->
+  <aside class="w-60 bg-panel border-r border-gray-800 scroll-y flex-shrink-0">
+    <div class="p-3">
+      <div class="relative mb-2">
+        <i class="fa-solid fa-filter absolute left-3 top-2.5 text-gray-500 text-xs"></i>
+        <input id="sideFilter" type="text" placeholder="Filter tabs..." class="w-full bg-dark border border-gray-800 rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-accent" onkeydown="if(event.key==='Enter'){doSideFilter()}">
+      </div>
+      <button onclick="doSideFilter()" class="btn btn-primary w-full text-[10px]"><i class="fa-solid fa-bolt mr-1"></i>Enter</button>
+    </div>
+
+    <div class="px-2 pb-4 space-y-4 text-xs">
+
+      <div>
+        <div class="px-3 mb-1.5 text-[9px] text-gray-500 font-black uppercase tracking-wider">Core Cockpit</div>
+        <button onclick="switchTab('home')" data-tab="home" class="tab-btn active w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-house text-sm w-4"></i>Home Dashboard</button>
+        <button onclick="switchTab('all-in-one')" data-tab="all-in-one" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-layer-group text-sm w-4"></i>All-In-One Workstation</button>
+        <button onclick="switchTab('pro-charts')" data-tab="pro-charts" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-chart-area text-sm w-4 text-accent"></i>Pro Charts <span class="ml-auto text-[8px] bg-accent/20 text-accent px-1.5 rounded font-bold">NEW</span></button>
+        <button onclick="switchTab('global-markets')" data-tab="global-markets" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-globe text-sm w-4"></i>Global Markets</button>
+        <button onclick="switchTab('symbol-detail')" data-tab="symbol-detail" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-magnifying-glass-chart text-sm w-4"></i>Symbol Detail</button>
+        <button onclick="switchTab('scanner')" data-tab="scanner" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-radar text-sm w-4"></i>Universal Scanner</button>
+        <button onclick="switchTab('short-interest')" data-tab="short-interest" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-arrow-down-short-wide text-sm w-4"></i>Short Interest</button>
+        <button onclick="switchTab('premarket')" data-tab="premarket" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-sun text-sm w-4"></i>Pre-Market</button>
+      </div>
+
+      <div>
+        <div class="px-3 mb-1.5 text-[9px] text-gray-500 font-black uppercase tracking-wider">Trading Tools</div>
+        <button onclick="switchTab('candles')" data-tab="candles" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-fire text-sm w-4 text-accent"></i>Candle Encyclopedia <span class="ml-auto text-[8px] bg-accent/20 text-accent px-1.5 rounded font-bold">38</span></button>
+        <button onclick="switchTab('options-chain')" data-tab="options-chain" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-water text-sm w-4"></i>Options Chain &amp; Flow</button>
+        <button onclick="switchTab('ai-charts')" data-tab="ai-charts" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-robot text-sm w-4"></i>AI Chart Engine</button>
+        <button onclick="switchTab('paper-trading')" data-tab="paper-trading" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-flask text-sm w-4"></i>Paper Trading</button>
+        <button onclick="switchTab('multi-chart')" data-tab="multi-chart" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-table-cells text-sm w-4"></i>Multi-Chart Layout</button>
+        <button onclick="switchTab('smart-stop')" data-tab="smart-stop" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-shield-halved text-sm w-4"></i>Smart Stop Manager</button>
+      </div>
+
+      <div>
+        <div class="px-3 mb-1.5 text-[9px] text-gray-500 font-black uppercase tracking-wider">Analytics</div>
+        <button onclick="switchTab('backtest')" data-tab="backtest" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-chart-line text-sm w-4"></i>Advanced Backtesting</button>
+        <button onclick="switchTab('correlation')" data-tab="correlation" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-circle-nodes text-sm w-4"></i>Correlation Matrix</button>
+        <button onclick="switchTab('regime')" data-tab="regime" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-compass text-sm w-4"></i>Market Regime</button>
+        <button onclick="switchTab('signals')" data-tab="signals" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-signal text-sm w-4"></i>Signal Performance</button>
+        <button onclick="switchTab('fib')" data-tab="fib" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-calculator text-sm w-4"></i>Fib &amp; Pivot Calculator</button>
+        <button onclick="switchTab('tpo')" data-tab="tpo" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-bars-staggered text-sm w-4"></i>TPO Market Profile</button>
+      </div>
+
+      <div>
+        <div class="px-3 mb-1.5 text-[9px] text-gray-500 font-black uppercase tracking-wider">Crypto Suite</div>
+        <button onclick="switchTab('crypto-dash')" data-tab="crypto-dash" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-brands fa-bitcoin text-sm w-4"></i>Crypto Dashboard</button>
+        <button onclick="switchTab('crypto-onchain')" data-tab="crypto-onchain" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-link text-sm w-4"></i>On-Chain Metrics</button>
+        <button onclick="switchTab('altseason')" data-tab="altseason" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-shuffle text-sm w-4"></i>Altseason Index</button>
+        <button onclick="switchTab('whale-tracker')" data-tab="whale-tracker" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-whale text-sm w-4"></i>Whale Tracker</button>
+      </div>
+
+      <div>
+        <div class="px-3 mb-1.5 text-[9px] text-gray-500 font-black uppercase tracking-wider">Education &amp; Feeds</div>
+        <button onclick="switchTab('playbook')" data-tab="playbook" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-chess text-sm w-4"></i>Strategy Playbook</button>
+        <button onclick="switchTab('psychology')" data-tab="psychology" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-brain text-sm w-4"></i>Psychology</button>
+        <button onclick="switchTab('congress')" data-tab="congress" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-user-secret text-sm w-4"></i>Congress &amp; Insider</button>
+        <button onclick="switchTab('alerts')" data-tab="alerts" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-bell text-sm w-4"></i>Alerts &amp; Push</button>
+      </div>
+
+      <div>
+        <div class="px-3 mb-1.5 text-[9px] text-gray-500 font-black uppercase tracking-wider">System</div>
+        <button onclick="switchTab('pl-tracker')" data-tab="pl-tracker" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-receipt text-sm w-4"></i>P&amp;L Tracker</button>
+        <button onclick="switchTab('settings')" data-tab="settings" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-gear text-sm w-4"></i>Settings &amp; API Vault</button>
+        <button onclick="switchTab('help')" data-tab="help" class="tab-btn w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5"><i class="fa-solid fa-circle-question text-sm w-4"></i>Help Center</button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 scroll-y" id="mainContent">
+    <!-- Tab content rendered here -->
+  </main>
+
+</div>
+
+<!-- BOTTOM TICKER -->
+<div class="bg-dark border-t border-gray-800 overflow-hidden fixed bottom-0 left-0 right-0" style="height:28px">
+  <div class="ticker-track ticker-fast py-1.5 text-[10px] font-mono" style="margin-left:240px">
+    <span class="px-4"><span class="text-gray-500">TSLA</span> <span class="text-white font-bold">$399.15</span> <span class="text-success font-bold">+4.60%</span></span>
+    <span class="px-4"><span class="text-gray-500">AAPL</span> <span class="text-white font-bold">$295.63</span> <span class="text-success font-bold">+1.39%</span></span>
+    <span class="px-4"><span class="text-gray-500">NVDA</span> <span class="text-white font-bold">$204.87</span> <span class="text-success font-bold">+2.22%</span></span>
+    <span class="px-4"><span class="text-gray-500">MSFT</span> <span class="text-white font-bold">$390.34</span> <span class="text-danger">-1.77%</span></span>
+    <span class="px-4"><span class="text-gray-500">AMZN</span> <span class="text-white font-bold">$241.51</span> <span class="text-success font-bold">+1.47%</span></span>
+    <span class="px-4"><span class="text-gray-500">META</span> <span class="text-white font-bold">$568.43</span> <span class="text-danger">-0.45%</span></span>
+    <span class="px-4"><span class="text-gray-500">GOOGL</span> <span class="text-white font-bold">$357.77</span> <span class="text-success font-bold">+0.39%</span></span>
+    <span class="px-4"><span class="text-gray-500">NFLX</span> <span class="text-white font-bold">$81.27</span> <span class="text-danger">-0.89%</span></span>
+    <span class="px-4"><span class="text-gray-500">AMD</span> <span class="text-white font-bold">$488.45</span> <span class="text-success font-bold">+7.97%</span></span>
+    <span class="px-4"><span class="text-gray-500">SPY</span> <span class="text-white font-bold">$737.76</span> <span class="text-success font-bold">+1.70%</span></span>
+    <span class="px-4"><span class="text-gray-500">QQQ</span> <span class="text-white font-bold">$717.12</span> <span class="text-success font-bold">+3.38%</span></span>
+    <span class="px-4"><span class="text-gray-500">SOL</span> <span class="text-white font-bold">$66.86</span> <span class="text-success">+5.20%</span></span>
+    <span class="px-4"><span class="text-gray-500">ETH</span> <span class="text-white font-bold">$1,670</span> <span class="text-success">+2.10%</span></span>
+    <!-- duplicate -->
+    <span class="px-4"><span class="text-gray-500">TSLA</span> <span class="text-white font-bold">$399.15</span> <span class="text-success font-bold">+4.60%</span></span>
+    <span class="px-4"><span class="text-gray-500">AAPL</span> <span class="text-white font-bold">$295.63</span> <span class="text-success font-bold">+1.39%</span></span>
+    <span class="px-4"><span class="text-gray-500">NVDA</span> <span class="text-white font-bold">$204.87</span> <span class="text-success font-bold">+2.22%</span></span>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  STATE
+// ============================================================
+let currentTab = 'home';
+let activeCandleSub = 'candles';   // candles | patterns38
+let activeSymbolDetailSub = 'overview';
+let activePsychologySub = 'style';
+let activeRegime = 'bull';
+let activeSession = 'pre';
+let activePlaybookSub = 'strategies';
+let proChartsSymbol = 'AAPL';
+let proChartsIndicators = ['EMA20','EMA50','VWAP','RSI'];
+let proChartsTimeframe = '1D';
+let globalTicker = 'AAPL';
+
+// ============================================================
+//  STATIC DATASETS
+// ============================================================
+const PATTERNS_38 = [
+  {id:'p1',name:'Ascending Triangle',cat:'Continuation',type:'Bullish',reliability:4,signal:'Buy on breakout',desc:'Flat top, rising bottoms. Buyers consistently higher lows; sellers defend same resistance. Break above flat line = strong continuation move.',how:'Wait for 2+ touches on top resistance. Enter on breakout candle close with volume ≥1.5× avg. Stop below the last higher low.',grad:'#10b981'},
+  {id:'p2',name:'Descending Triangle',cat:'Continuation',type:'Bearish',reliability:4,signal:'Sell on breakdown',desc:'Flat bottom, falling tops. Sellers push lower highs; buyers defend same support. Break below flat line = strong continuation.',how:'Enter short on breakdown with volume confirmation. Stop above the last lower high. Target = triangle height projected down.',grad:'#ef4444'},
+  {id:'p3',name:'Symmetrical Triangle',cat:'Continuation',type:'Neutral',reliability:3,signal:'Trade the breakout',desc:'Converging highs and lows. Compression often leads to explosive move in direction of prior trend.',how:'Measure the height at the widest point. Enter on breakout; target = projected height added to breakout point.',grad:'#f59e0b'},
+  {id:'p4',name:'Bull Flag',cat:'Continuation',type:'Bullish',reliability:5,signal:'Buy the flag breakout',desc:'Sharp pole (impulse), then small parallel channel against trend. Classic trend continuation after brief consolidation.',how:'Trade when price breaks above flag high. Pole should be on ≥2× avg volume. R:R target = pole height from breakout.',grad:'#10b981'},
+  {id:'p5',name:'Bear Flag',cat:'Continuation',type:'Bearish',reliability:5,signal:'Sell the flag breakdown',desc:'Sharp down-pole, then small parallel channel up. Continuation pattern during strong downtrends.',how:'Enter short when flag low breaks. Confirm with volume surge. Stop above flag high.',grad:'#ef4444'},
+  {id:'p6',name:'Rising Wedge',cat:'Reversal',type:'Bearish',reliability:4,signal:'Sell the breakdown',desc:'Both trend lines slope up but converging. Momentum weakening despite higher prices. Bearish reversal pattern.',how:'Enter short on break of lower trendline. Often appears at end of uptrend. Target measured move of wedge height.',grad:'#ef4444'},
+  {id:'p7',name:'Falling Wedge',cat:'Reversal',type:'Bullish',reliability:4,signal:'Buy the breakout',desc:'Both trend lines slope down but converging. Selling pressure exhausting → bullish reversal.',how:'Enter long on break of upper trendline with volume. Stop below last lower low within wedge.',grad:'#10b981'},
+  {id:'p8',name:'Cup and Handle',cat:'Continuation',type:'Bullish',reliability:5,signal:'Buy handle breakout',desc:'U-shaped recovery (cup), then small consolidation (handle). Classic bullish continuation after basing pattern.',how:'Buy when handle high breaks. Cup depth = target projection. Stop below handle low.',grad:'#10b981'},
+  {id:'p9',name:'Inverse Cup &amp; Handle',cat:'Reversal',type:'Bullish',reliability:4,signal:'Buy neckline break',desc:'Inverted U-shape during downtrend, then small handle. Bullish reversal pattern.',how:'Enter on neckline break with volume. Stop below handle low.',grad:'#10b981'},
+  {id:'p10',name:'Double Bottom (W)',cat:'Reversal',type:'Bullish',reliability:5,signal:'Buy neckline break',desc:'Two equal lows with peak in between (looks like W). Strong bullish reversal pattern.',how:'Wait for close above neckline. Stop below second bottom. Target = W height added to neckline.',grad:'#10b981'},
+  {id:'p11',name:'Double Top (M)',cat:'Reversal',type:'Bearish',reliability:5,signal:'Sell neckline break',desc:'Two equal highs with trough in between (looks like M). Strong bearish reversal pattern.',how:'Enter short on close below neckline. Stop above second top. Target = M height subtracted.',grad:'#ef4444'},
+  {id:'p12',name:'Triple Bottom',cat:'Reversal',type:'Bullish',reliability:5,signal:'Buy resistance break',desc:'Three equal lows. Stronger confirmation than double bottom; sellers exhausted.',how:'Enter on close above resistance line. Stop below lowest low.',grad:'#10b981'},
+  {id:'p13',name:'Triple Top',cat:'Reversal',type:'Bearish',reliability:5,signal:'Sell support break',desc:'Three equal highs. Stronger bearish reversal confirmation.',how:'Enter on close below support. Stop above highest high.',grad:'#ef4444'},
+  {id:'p14',name:'Head and Shoulders',cat:'Reversal',type:'Bearish',reliability:5,signal:'Sell neckline break',desc:'Three peaks: middle (head) highest, two sides (shoulders) lower. Classic bearish reversal.',how:'Enter short on close below neckline. Stop above right shoulder. Target = head-to-neckline distance.',grad:'#ef4444'},
+  {id:'p15',name:'Inverse Head &amp; Shoulders',cat:'Reversal',type:'Bullish',reliability:5,signal:'Buy neckline break',desc:'Three troughs: middle (head) lowest. Bullish reversal during downtrend.',how:'Enter on close above neckline. Stop below right shoulder. Target = head-to-neckline distance upward.',grad:'#10b981'},
+  {id:'p16',name:'Falling Channel',cat:'Continuation',type:'Bearish',reliability:3,signal:'Sell rallies',desc:'Parallel downtrend channel. Sell near upper boundary.',how:'Enter short near top boundary. Stop above channel. Target = channel width projected.',grad:'#ef4444'},
+  {id:'p17',name:'Rising Channel',cat:'Continuation',type:'Bullish',reliability:3,signal:'Buy dips',desc:'Parallel uptrend channel. Buy near lower boundary.',how:'Enter long near bottom. Stop below channel. Target = channel width.',grad:'#10b981'},
+  {id:'p18',name:'Rectangle (Range)',cat:'Continuation',type:'Neutral',reliability:3,signal:'Trade the boundary',desc:'Price consolidates between horizontal support and resistance.',how:'Trade the boundary: long near support, short near resistance. Stop just outside the range.',grad:'#f59e0b'},
+  {id:'p19',name:'Diamond Top',cat:'Reversal',type:'Bearish',reliability:4,signal:'Sell breakdown',desc:'Price expands then contracts, forming diamond shape. Reversal pattern after uptrend.',how:'Enter short on breakdown below diamond low. Volume often spikes on the breakdown.',grad:'#ef4444'},
+  {id:'p20',name:'Diamond Bottom',cat:'Reversal',type:'Bullish',reliability:4,signal:'Buy breakout',desc:'Inverted diamond. Reversal pattern after downtrend.',how:'Enter long on breakout above diamond high with volume.',grad:'#10b981'},
+  {id:'p21',name:'Broadening Formation',cat:'Reversal',type:'Neutral',reliability:3,signal:'Wait for confirmation',desc:'Expanding highs and lows (megaphone). High volatility, often ends trend.',how:'Trade the boundary that breaks first. Stop = midpoint of formation.',grad:'#f59e0b'},
+  {id:'p22',name:'Island Reversal',cat:'Reversal',type:'Bullish',reliability:5,signal:'Trade the gap direction',desc:'Two gaps on opposite sides of a small price island. Strong reversal signal.',how:'Trade in direction of second gap. Stop on the island.',grad:'#3b82f6'},
+  {id:'p23',name:'Measured Move (AB=CD)',cat:'Continuation',type:'Neutral',reliability:4,signal:'Trade C to D',desc:'Two equal legs forming AB=CD harmonic. Predicts D target.',how:'Calculate using Fibonacci ratios. Enter at C completion. Target = D extension.',grad:'#3b82f6'},
+  {id:'p24',name:'Three Drives',cat:'Reversal',type:'Neutral',reliability:4,signal:'Trade third drive failure',desc:'Three successive higher highs/lows with Fibonacci relationships. Reversal pattern.',how:'Enter on third drive failure. Stop beyond third drive extreme.',grad:'#3b82f6'},
+  {id:'p25',name:'Gartley Pattern',cat:'Reversal',type:'Bullish',reliability:4,signal:'Buy D completion',desc:'Four-leg harmonic with specific Fibonacci ratios (0.618, 0.786, 1.272).',how:'Enter at D with confirmation candle. Stop below X point. Target = 0.382 retracement of AD.',grad:'#10b981'},
+  {id:'p26',name:'Butterfly Pattern',cat:'Reversal',type:'Neutral',reliability:4,signal:'Trade D completion',desc:'Harmonic with 1.27 extension at D (vs Gartley 0.786).',how:'Trade at D point with strict stop. Different target depending on bullish/bearish.',grad:'#3b82f6'},
+  {id:'p27',name:'Bat Pattern',cat:'Reversal',type:'Neutral',reliability:4,signal:'Trade D completion',desc:'Harmonic with 0.886 retracement at B. Very precise.',how:'Enter at D. Stop beyond X. Target = 0.382 retracement of AD.',grad:'#3b82f6'},
+  {id:'p28',name:'Cypher Pattern',cat:'Reversal',type:'Neutral',reliability:3,signal:'Trade D completion',desc:'Harmonic with 0.786 retracement at C, 1.272 BC projection at D.',how:'Enter at D. Targets = 0.382 and 0.618 retracements of CD.',grad:'#3b82f6'},
+  {id:'p29',name:'Crab Pattern',cat:'Reversal',type:'Neutral',reliability:4,signal:'Trade D extreme',desc:'Harmonic with 1.618 extension at D. Predicts extreme reversals.',how:'Enter at D with tight stop. Target small retracement (0.382).',grad:'#3b82f6'},
+  {id:'p30',name:'Shark Pattern',cat:'Reversal',type:'Neutral',reliability:3,signal:'Trade D completion',desc:'5-point harmonic using 0.886 and 1.13 ratios.',how:'Enter at completion point. Quick scalp target.',grad:'#3b82f6'},
+  {id:'p31',name:'Pennant',cat:'Continuation',type:'Neutral',reliability:4,signal:'Trade the breakout',desc:'Small symmetrical triangle after sharp move. Continuation pattern.',how:'Enter on breakout in direction of prior trend. Target = length of pole.',grad:'#f59e0b'},
+  {id:'p32',name:'Wedge Expanding',cat:'Reversal',type:'Neutral',reliability:3,signal:'Trade the boundary',desc:'Both lines diverge. High volatility pattern.',how:'Trade the boundary break with tight stop. Often reverses trend.',grad:'#f59e0b'},
+  {id:'p33',name:'V-Bottom (V-Recovery)',cat:'Reversal',type:'Bullish',reliability:3,signal:'Buy recovery',desc:'Sharp drop followed by sharp reversal. Fast V-shape recovery.',how:'Confirm reversal with bullish candle. Enter on close above midpoint.',grad:'#10b981'},
+  {id:'p34',name:'V-Top',cat:'Reversal',type:'Bearish',reliability:3,signal:'Sell reversal',desc:'Sharp rally followed by sharp reversal.',how:'Confirm reversal. Enter on close below midpoint.',grad:'#ef4444'},
+  {id:'p35',name:'Rounding Bottom',cat:'Reversal',type:'Bullish',reliability:4,signal:'Buy neckline',desc:'Gradual U-shape accumulation. Long-term reversal pattern.',how:'Enter on neckline break with volume. Stop below midpoint of rounding.',grad:'#10b981'},
+  {id:'p36',name:'Rounding Top',cat:'Reversal',type:'Bearish',reliability:4,signal:'Sell breakdown',desc:'Gradual dome distribution. Long-term reversal.',how:'Enter short on breakdown. Stop above midpoint.',grad:'#ef4444'},
+  {id:'p37',name:'Gap and Go',cat:'Continuation',type:'Bullish',reliability:4,signal:'Buy gap',desc:'Gap up at open that holds. Strong continuation signal.',how:'Enter on first pullback to gap fill (50%). Stop below gap low.',grad:'#10b981'},
+  {id:'p38',name:'Exhaustion Gap',cat:'Reversal',type:'Bearish',reliability:4,signal:'Fade the gap',desc:'Final gap in trend direction, then reversal. Often fills quickly.',how:'Wait for reversal candle. Enter on close below gap low. Stop above gap.',grad:'#ef4444'},
+];
+
+const INDICATORS_LIB = {
+  'Trend': [
+    {id:'sma',name:'SMA (Simple MA)',cat:'Trend',desc:'Average of last N closes. Smooths noise.',use:'Identify overall direction. Crossovers (e.g., 50/200) signal regime changes.',read:'Price > SMA = uptrend. Price < SMA = downtrend. SMA sloping up = bullish momentum.',color:'#3b82f6'},
+    {id:'ema',name:'EMA (Exponential MA)',cat:'Trend',desc:'Weighted average favoring recent prices. Faster than SMA.',use:'More responsive than SMA. Good for short-term trend.',read:'Same as SMA but reacts faster. Watch 9/21 EMA crossovers intraday.',color:'#8b5cf6'},
+    {id:'hma',name:'Hull MA',cat:'Trend',desc:'Smoothed moving average with reduced lag.',use:'Catch trends earlier with less noise.',read:'Sharp turns with minimal whipsaw.',color:'#ec4899'},
+    {id:'vwap',name:'VWAP',cat:'Trend',desc:'Volume-Weighted Average Price. Session benchmark.',use:'Day traders use VWAP as institutional fair value.',read:'Price > VWAP = buyers in control. Price < VWAP = sellers.',color:'#f59e0b'},
+    {id:'ichimoku',name:'Ichimoku Cloud',cat:'Trend',desc:'Multi-line trend system: Tenkan, Kijun, Senkou A/B, Chikou.',use:'Complete trend + support/resistance in one overlay.',read:'Price above cloud = bullish. Cloud thickness = trend strength.',color:'#06b6d4'},
+    {id:'psar',name:'Parabolic SAR',cat:'Trend',desc:'Stop-and-reverse dots above/below price.',use:'Trailing stop system in trends.',read:'Dots below = uptrend. Dots above = downtrend. Flip = reversal signal.',color:'#10b981'},
+    {id:'supertrend',name:'SuperTrend',cat:'Trend',desc:'ATR-based trend indicator with clear line.',use:'Single-line trend filter and signal generator.',read:'Green line = uptrend (long). Red line = downtrend (short).',color:'#10b981'},
+  ],
+  'Momentum': [
+    {id:'rsi',name:'RSI (Relative Strength Index)',cat:'Momentum',desc:'0-100 oscillator measuring speed/magnitude of price changes.',use:'Identify overbought/oversold conditions and divergences.',read:'>70 = overbought (potential reversal down). <30 = oversold (potential reversal up). 50 = neutral.',color:'#8b5cf6'},
+    {id:'macd',name:'MACD',cat:'Momentum',desc:'Moving Avg Convergence Divergence: 12-EMA minus 26-EMA, with 9-EMA signal.',use:'Trend + momentum in one indicator.',read:'MACD crosses signal line = entry. Histogram grows = trend strength.',color:'#3b82f6'},
+    {id:'stoch',name:'Stochastic Oscillator',cat:'Momentum',desc:'Compares close to price range over N periods.',use:'Range-bound oscillator for reversals.',read:'>80 = overbought, <20 = oversold. %K/%D crossovers give entries.',color:'#8b5cf6'},
+    {id:'cci',name:'CCI (Commodity Channel Index)',cat:'Momentum',desc:'Measures deviation from statistical mean.',use:'Cyclical turns and breakouts.',read:'>+100 = overbought, <-100 = oversold. Zero-cross = momentum shift.',color:'#10b981'},
+    {id:'williams',name:'Williams %R',cat:'Momentum',desc:'Inverse stochastic, scale -100 to 0.',use:'Quick overbought/oversold reads.',read:'>-20 = overbought, <-80 = oversold.',color:'#ef4444'},
+    {id:'mfi',name:'Money Flow Index',cat:'Momentum',desc:'Volume-weighted RSI (0-100).',use:'Confirms RSI signals with volume.',read:'>80 = overbought, <20 = oversold. Divergences are powerful.',color:'#f59e0b'},
+    {id:'roc',name:'Rate of Change',cat:'Momentum',desc:'Percentage change over N periods.',use:'Momentum strength and divergences.',read:'Rising = accelerating momentum. Falling = decelerating.',color:'#3b82f6'},
+  ],
+  'Volatility': [
+    {id:'bb',name:'Bollinger Bands',cat:'Volatility',desc:'SMA ± 2 standard deviations. Volatility envelope.',use:'Mean reversion + squeeze detection.',read:'Price at upper band = overbought. Bands squeeze = breakout coming.',color:'#8b5cf6'},
+    {id:'atr',name:'ATR (Average True Range)',cat:'Volatility',desc:'Average of true ranges. Volatility in points/dollars.',use:'Position sizing and stop placement.',read:'Higher ATR = wider stops needed. ATR(14) is standard.',color:'#f59e0b'},
+    {id:'kc',name:'Keltner Channels',cat:'Volatility',desc:'EMA ± ATR multiplier. Smoother than BB.',use:'Trend-following envelope.',read:'Price above upper channel = strong trend. Squeeze vs Bollinger Bands = signal.',color:'#10b981'},
+    {id:'donchian',name:'Donchian Channels',cat:'Volatility',desc:'Highest high / lowest low over N periods.',use:'Breakout trading.',read:'Break above N-period high = long entry. Below N-period low = short.',color:'#3b82f6'},
+    {id:'hv',name:'Historical Volatility',cat:'Volatility',desc:'StdDev of log returns annualized.',use:'Compare to IV to find vol edges.',read:'HV > IV = options cheap. HV < IV = options rich.',color:'#ef4444'},
+  ],
+  'Volume': [
+    {id:'obv',name:'OBV (On Balance Volume)',cat:'Volume',desc:'Cumulative volume based on close direction.',use:'Confirm price moves with volume.',read:'OBV rising + price rising = confirmed trend. Divergences warn of reversal.',color:'#3b82f6'},
+    {id:'vwap2',name:'VWAP Bands',cat:'Volume',desc:'VWAP ± standard deviation bands.',use:'Intraday mean reversion.',read:'Price at lower band = potential long. Upper band = potential short.',color:'#f59e0b'},
+    {id:'volprofile',name:'Volume Profile',cat:'Volume',desc:'Horizontal volume distribution by price.',use:'Find high-volume support/resistance.',read:'POC = Point of Control (highest vol). VAH/VAL = value area high/low.',color:'#8b5cf6'},
+    {id:'ad',name:'A/D Line (Accumulation/Distribution)',cat:'Volume',desc:'Cumulative indicator using close position in range.',use:'Confirm breakouts with volume.',read:'A/D rising while price flat = accumulation (bullish).',color:'#10b981'},
+    {id:'cmf',name:'Chaikin Money Flow',cat:'Volume',desc:'A/D normalized over period.',use:'Buying/selling pressure over time.',read:'>0 = buying pressure. <0 = selling pressure.',color:'#ec4899'},
+  ],
+  'Breadth': [
+    {id:'adline',name:'Advance-Decline Line',cat:'Breadth',desc:'Cumulative advancing minus declining stocks.',use:'Market internals confirmation.',read:'Rising AD line = healthy uptrend. Divergence vs index = warning.',color:'#3b82f6'},
+    {id:'mcsum',name:'McClellan Summation Index',cat:'Breadth',desc:'Smoothed McClellan oscillator.',use:'Breadth cycles and reversals.',read:'>0 = bullish breadth. Cross above zero from below = buy.',color:'#8b5cf6'},
+    {id:'new高低',name:'New Highs - New Lows',cat:'Breadth',desc:'Difference between stocks making new highs vs lows.',use:'Leading indicator for reversals.',read:'NH-NL rising = healthy. Negative = distribution.',color:'#10b981'},
+    {id:'pctabove',name:'% Above 200 SMA',cat:'Breadth',desc:'Percentage of stocks above their 200 SMA.',use:'Long-term health gauge.',read:'>70% = overbought market. <30% = oversold. Bear markets often below 30%.',color:'#f59e0b'},
+  ],
+  'Support/Resistance': [
+    {id:'pivot',name:'Pivot Points',cat:'S/R',desc:'Floor pivots calculated from prior period H/L/C.',use:'Day traders identify intraday support/resistance.',read:'PP = pivot. R1/R2/R3 = resistance. S1/S2/S3 = support.',color:'#3b82f6'},
+    {id:'fib',name:'Fibonacci Retracements',cat:'S/R',desc:'Key retracement levels: 23.6%, 38.2%, 50%, 61.8%, 78.6%.',use:'Pullback entries within trends.',read:'61.8% = "golden ratio" - strongest level. 50% = common retracement.',color:'#f59e0b'},
+    {id:'vwappivot',name:'VWAP Pivots',cat:'S/R',desc:'Multi-session VWAP levels.',use:'Intraday trend strength across sessions.',read:'Price above all VWAPs = strong uptrend.',color:'#8b5cf6'},
+  ],
+};
+
+const MARKET_INDICES = [
+  {sym:'SPX',name:'S&amp;P 500',price:'7,394.12',chg:'+1.70%',isUp:true},
+  {sym:'NDX',name:'Nasdaq 100',price:'29,446.55',chg:'+3.38%',isUp:true},
+  {sym:'DJI',name:'Dow Jones',price:'50,848.20',chg:'+0.92%',isUp:true},
+  {sym:'RUT',name:'Russell 2000',price:'2,921.45',chg:'+1.85%',isUp:true},
+  {sym:'VIX',name:'VIX',price:'19.44',chg:'-2.10%',isUp:false},
+  {sym:'DXY',name:'Dollar Index',price:'104.18',chg:'-0.32%',isUp:false},
+];
+
+const CRYPTO_TOP = [
+  {sym:'BTC',price:'$63,388',chg:'+2.40%'},
+  {sym:'ETH',price:'$1,670',chg:'+2.10%'},
+  {sym:'SOL',price:'$66.86',chg:'+5.20%'},
+  {sym:'BNB',price:'$602',chg:'+1.40%'},
+  {sym:'XRP',price:'$1.14',chg:'+0.80%'},
+  {sym:'ADA',price:'$0.171',chg:'+1.20%'},
+  {sym:'DOGE',price:'$0.0863',chg:'+3.50%'},
+  {sym:'AVAX',price:'$6.66',chg:'+4.10%'},
+];
+
+const EARNINGS_NEXT_WEEK = [
+  {date:'Jul 18',ticker:'NFLX',eps:'$4.80',rev:'$10.2B',time:'Post-Mkt'},
+  {date:'Jul 23',ticker:'TSLA',eps:'$0.58',rev:'$25.0B',time:'Post-Mkt'},
+  {date:'Jul 23',ticker:'GOOGL',eps:'$1.84',rev:'$96.5B',time:'Post-Mkt'},
+  {date:'Jul 24',ticker:'IBM',eps:'$2.43',rev:'$15.8B',time:'Pre-Mkt'},
+  {date:'Jul 30',ticker:'MSFT',eps:'$2.92',rev:'$64.7B',time:'Post-Mkt'},
+  {date:'Jul 31',ticker:'AAPL',eps:'$1.34',rev:'$84.5B',time:'Post-Mkt'},
+  {date:'Aug 01',ticker:'AMZN',eps:'$1.15',rev:'$155.2B',time:'Post-Mkt'},
+  {date:'Aug 01',ticker:'META',eps:'$4.85',rev:'$39.1B',time:'Post-Mkt'},
+];
+
+const ECONOMIC_EVENTS = [
+  {date:'Jul 17',event:'Retail Sales (MoM)',impact:'High',prev:'0.4%',fcst:'0.3%'},
+  {date:'Jul 18',event:'Industrial Production',impact:'Medium',prev:'0.2%',fcst:'0.1%'},
+  {date:'Jul 25',event:'Initial Jobless Claims',impact:'Medium',prev:'222K',fcst:'225K'},
+  {date:'Jul 30',event:'FOMC Rate Decision',impact:'High',prev:'5.50%',fcst:'5.50%'},
+  {date:'Jul 31',event:'Core PCE (YoY)',impact:'High',prev:'2.6%',fcst:'2.7%'},
+  {date:'Aug 02',event:'Non-Farm Payrolls',impact:'High',prev:'206K',fcst:'180K'},
+];
+
+const IPO_UPCOMING = [
+  {date:'Jul 22',ticker:'NEXA',company:'NexaMind AI',price:'$18-22',shares:'12.5M'},
+  {date:'Jul 24',ticker:'CYBR',company:'CyberShield Inc',price:'$24-28',shares:'8M'},
+  {date:'Jul 29',ticker:'GENV',company:'Geneva Therapeutics',price:'$32-36',shares:'15M'},
+  {date:'Aug 05',ticker:'SLCT',company:'Solstice Energy',price:'$15-18',shares:'22M'},
+  {date:'Aug 07',ticker:'PRTL',company:'Portal Robotics',price:'$28-32',shares:'6M'},
+];
+
+const CONGRESS_TRADES = [
+  {politician:'Nancy Pelosi',party:'Democrat',ticker:'NVDA',type:'BUY',amount:'$1.0M-$5.0M',date:'2025-06-15',price:'$201.50',chg:'+1.7%'},
+  {politician:'Nancy Pelosi',party:'Democrat',ticker:'AAPL',type:'BUY',amount:'$250K-$500K',date:'2025-06-15',price:'$292.10',chg:'+1.2%'},
+  {politician:'Dan Crenshaw',party:'Republican',ticker:'XOM',type:'BUY',amount:'$15K-$50K',date:'2025-06-20',price:'$114.30',chg:'+0.5%'},
+  {politician:'Tommy Tuberville',party:'Republican',ticker:'TSLA',type:'SELL',amount:'$50K-$100K',date:'2025-06-22',price:'$395.20',chg:'+1.0%'},
+  {politician:'Josh Gottheimer',party:'Democrat',ticker:'MSFT',type:'BUY',amount:'$15K-$50K',date:'2025-06-25',price:'$385.40',chg:'+1.3%'},
+  {politician:'Ro Khanna',party:'Democrat',ticker:'GOOGL',type:'BUY',amount:'$50K-$100K',date:'2025-06-28',price:'$352.10',chg:'+1.6%'},
+  {politician:'Nancy Pelosi',party:'Democrat',ticker:'MSFT',type:'BUY',amount:'$1.0M-$5.0M',date:'2025-07-02',price:'$388.50',chg:'+0.5%'},
+  {politician:'Michael McCaul',party:'Republican',ticker:'PLTR',type:'BUY',amount:'$15K-$50K',date:'2025-07-05',price:'$28.40',chg:'+3.2%'},
+];
+
+const INSIDER_TRADES = [
+  {name:'Tim Cook',role:'CEO, Apple',ticker:'AAPL',type:'SELL',amount:'$41.5M',date:'2025-07-08',price:'$293.20'},
+  {name:'Satya Nadella',role:'CEO, Microsoft',ticker:'MSFT',type:'SELL',amount:'$285.4M',date:'2025-07-01',price:'$387.80'},
+  {name:'Mark Zuckerberg',role:'CEO, Meta',ticker:'META',type:'SELL',amount:'$156.2M',date:'2025-07-03',price:'$562.30'},
+  {name:'Jensen Huang',role:'CEO, NVIDIA',ticker:'NVDA',type:'SELL',amount:'$12.1M',date:'2025-06-29',price:'$202.10'},
+  {name:'Elon Musk',role:'CEO, Tesla',ticker:'TSLA',type:'BUY',amount:'$45.2M',date:'2025-07-02',price:'$398.50'},
+  {name:'Andy Jassy',role:'CEO, Amazon',ticker:'AMZN',type:'SELL',amount:'$22.8M',date:'2025-07-05',price:'$240.10'},
+  {name:'Sundar Pichai',role:'CEO, Alphabet',ticker:'GOOGL',type:'SELL',amount:'$18.4M',date:'2025-07-09',price:'$356.20'},
+  {name:'Lisa Su',role:'CEO, AMD',ticker:'AMD',type:'BUY',amount:'$2.5M',date:'2025-07-04',price:'$485.20'},
+];
+
+const NEWS_FEED = [
+  {time:'7:24 PM',ticker:'NVDA',title:'NVIDIA announces next-gen Blackwell Ultra chips',source:'Reuters',impact:'Bullish',chg:'+2.4%'},
+  {time:'7:18 PM',ticker:'TSLA',title:'Tesla Q2 deliveries beat estimates by 3.2%',source:'Bloomberg',impact:'Bullish',chg:'+1.8%'},
+  {time:'7:12 PM',ticker:'AAPL',title:'Apple Vision Pro 2 launch scheduled for September',source:'TechCrunch',impact:'Bullish',chg:'+0.9%'},
+  {time:'7:05 PM',ticker:'META',title:'Meta faces EU antitrust probe over AI data practices',source:'WSJ',impact:'Bearish',chg:'-0.7%'},
+  {time:'6:58 PM',ticker:'BTC',title:'Spot Bitcoin ETFs see record $487M daily inflows',source:'CoinDesk',impact:'Bullish',chg:'+2.4%'},
+  {time:'6:45 PM',ticker:'AMZN',title:'AWS revenue grows 19% YoY, beats estimates',source:'Reuters',impact:'Bullish',chg:'+1.2%'},
+  {time:'6:32 PM',ticker:'NFLX',title:'Netflix subscriber growth slows in Latin America',source:'Variety',impact:'Bearish',chg:'-0.5%'},
+  {time:'6:20 PM',ticker:'JPM',title:'JPMorgan warns of geopolitical risk to markets',source:'CNBC',impact:'Neutral',chg:'-0.2%'},
+];
+
+// ============================================================
+//  RENDERERS
+// ============================================================
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`[data-tab="${tab}"]`);
+  if (btn) btn.classList.add('active');
+  renderActiveTab();
+  playBeep(800, 50);
+}
+
+function doGlobalSearch() {
+  const input = document.getElementById('globalSearch');
+  if (!input || !input.value.trim()) return;
+  globalTicker = input.value.toUpperCase().trim();
+  switchTab('symbol-detail');
+}
+
+function doSideFilter() {
+  const input = document.getElementById('sideFilter');
+  if (!input || !input.value.trim()) return;
+  const q = input.value.toLowerCase();
+  const match = document.querySelector(`.tab-btn[onclick*="'${q}'"]`);
+  if (match) match.click();
+  else switchTab('home');
+}
+
+function renderActiveTab() {
+  const c = document.getElementById('mainContent');
+  if (!c) return;
+  const r = renderers[currentTab];
+  if (!r) { c.innerHTML = '<div class="p-10 text-center text-gray-500">Tab not found</div>'; return; }
+  try {
+    c.innerHTML = r();
+    initTabScripts(currentTab);
+  } catch (e) {
+    console.error('Render error', e);
+    c.innerHTML = `<div class="p-10 text-red-400">Render error: ${e.message}</div>`;
+  }
+}
+
+const renderers = {
+
+home: () => `
+<div class="p-6 space-y-5">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-house text-accent"></i>Home Dashboard</h1>
+      <p class="text-xs text-gray-500 mt-1">Live market overview, watchlist, news &amp; quick execution</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="tag bg-success/15 text-success"><span class="live-dot"></span> LIVE · Yahoo + CoinGecko</span>
+      <button onclick="switchTab('all-in-one')" class="btn btn-primary"><i class="fa-solid fa-layer-group mr-1"></i>Open Workstation</button>
+    </div>
+  </div>
+
+  <!-- Market Index Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+    ${MARKET_INDICES.map(i => `
+      <div class="card cursor-pointer hover:border-accent transition" onclick="switchTab('global-markets')">
+        <div class="text-[9px] text-gray-500 font-bold uppercase">${i.name}</div>
+        <div class="text-lg font-black font-mono mt-1">${i.price}</div>
+        <div class="text-[10px] font-bold ${i.isUp?'text-success':'text-danger'}">${i.chg}</div>
+      </div>
+    `).join('')}
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <!-- Watchlist -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-black uppercase text-accent tracking-wider"><i class="fa-solid fa-star mr-1"></i>Watchlist</h3>
+        <span class="text-[9px] text-gray-500">Click row to load</span>
+      </div>
+      <div class="space-y-1.5">
+        ${[
+          ['TSLA','$399.15','+4.60%',true],['AAPL','$295.63','+1.39%',true],['NVDA','$204.87','+2.22%',true],
+          ['MSFT','$390.34','-1.77%',false],['AMZN','$241.51','+1.47%',true],['META','$568.43','-0.45%',false],
+          ['GOOGL','$357.77','+0.39%',true],['NFLX','$81.27','-0.89%',false],['AMD','$488.45','+7.97%',true],
+        ].map(([t,p,c,u])=>`<div class="flex justify-between p-2 rounded-lg hover:bg-dark cursor-pointer" onclick="globalTicker='${t}';switchTab('symbol-detail')"><span class="font-bold font-mono">${t}</span><span class="font-mono">${p}</span><span class="font-mono font-bold ${u?'text-success':'text-danger'}">${c}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Top Gainers / Losers -->
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent tracking-wider mb-3"><i class="fa-solid fa-arrow-trend-up mr-1"></i>Top Movers</h3>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <div class="text-[10px] text-success font-bold mb-1.5"><i class="fa-solid fa-arrow-up mr-1"></i>GAINERS</div>
+          ${[['NVDA','+5.80%'],['AMD','+7.97%'],['SMCI','+9.20%'],['PLTR','+6.40%'],['ARM','+4.80%']].map(([t,c])=>`<div class="flex justify-between py-1.5 text-xs"><span class="font-mono">${t}</span><span class="text-success font-bold">${c}</span></div>`).join('')}
+        </div>
+        <div>
+          <div class="text-[10px] text-danger font-bold mb-1.5"><i class="fa-solid fa-arrow-down mr-1"></i>LOSERS</div>
+          ${[['INTC','-3.40%'],['PYPL','-2.80%'],['DIS','-2.20%'],['BA','-1.90%'],['NKE','-1.60%']].map(([t,c])=>`<div class="flex justify-between py-1.5 text-xs"><span class="font-mono">${t}</span><span class="text-danger font-bold">${c}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- News -->
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent tracking-wider mb-3"><i class="fa-solid fa-newspaper mr-1"></i>Latest News</h3>
+      <div class="space-y-2">
+        ${NEWS_FEED.slice(0,6).map(n=>`<div class="text-xs"><div class="flex items-center gap-2 mb-0.5"><span class="text-gray-500 font-mono text-[9px]">${n.time}</span><span class="font-bold font-mono">${n.ticker}</span><span class="${n.impact==='Bullish'?'text-success':'text-danger'} text-[9px] font-bold">${n.impact}</span></div><div class="text-gray-300">${n.title}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Chart + Trades -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-black uppercase text-accent tracking-wider"><i class="fa-solid fa-chart-area mr-1"></i>Quick Chart · TSLA</h3>
+        <button onclick="globalTicker='TSLA';switchTab('pro-charts')" class="text-[10px] text-accent font-bold">Open Pro Chart →</button>
+      </div>
+      <canvas id="homeChart" height="220"></canvas>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent tracking-wider mb-3"><i class="fa-solid fa-flask mr-1"></i>Paper Trades Today</h3>
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between p-2 rounded-lg bg-success/10 border border-success/20">
+          <span class="font-mono font-bold">NVDA</span>
+          <span class="text-gray-400">BUY 100 @ $201.40</span>
+          <span class="text-success font-bold">+$348</span>
+        </div>
+        <div class="flex justify-between p-2 rounded-lg bg-success/10 border border-success/20">
+          <span class="font-mono font-bold">AMD</span>
+          <span class="text-gray-400">BUY 50 @ $462.10</span>
+          <span class="text-success font-bold">+$1,318</span>
+        </div>
+        <div class="flex justify-between p-2 rounded-lg bg-danger/10 border border-danger/20">
+          <span class="font-mono font-bold">NFLX</span>
+          <span class="text-gray-400">SELL 80 @ $82.10</span>
+          <span class="text-danger font-bold">-$66</span>
+        </div>
+        <div class="flex justify-between p-2 rounded-lg bg-success/10 border border-success/20">
+          <span class="font-mono font-bold">SOL</span>
+          <span class="text-gray-400">BUY 25 @ $63.50</span>
+          <span class="text-success font-bold">+$84</span>
+        </div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-gray-800 flex justify-between text-xs">
+        <span class="text-gray-500">Total P&amp;L</span>
+        <span class="text-success font-black text-base">+$1,684</span>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+'all-in-one': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-layer-group text-accent"></i>All-In-One Workstation</h1>
+      <p class="text-xs text-gray-500 mt-1">Watchlist · Live Chart · L2 · News · Quick Trade · Panic Close — all visible at once</p>
+    </div>
+    <button class="btn bg-danger text-white font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i>PANIC CLOSE ALL</button>
+  </div>
+  <div class="grid grid-cols-12 gap-4" style="height: calc(100vh - 220px)">
+    <!-- Left: Watchlist + Scanner -->
+    <div class="col-span-3 space-y-3">
+      <div class="card h-1/2 overflow-hidden flex flex-col">
+        <h3 class="text-[10px] font-black uppercase text-accent mb-2"><i class="fa-solid fa-star mr-1"></i>Watchlist</h3>
+        <div class="flex-1 scroll-y space-y-1">
+          ${[['TSLA','$399.15','+4.60%',true],['AAPL','$295.63','+1.39%',true],['NVDA','$204.87','+2.22%',true],['AMD','$488.45','+7.97%',true],['MSFT','$390.34','-1.77%',false],['META','$568.43','-0.45%',false],['GOOGL','$357.77','+0.39%',true],['NFLX','$81.27','-0.89%',false],['BTC','$63,388','+2.40%',true],['ETH','$1,670','+2.10%',true]].map(([t,p,c,u])=>`<div class="flex justify-between p-2 rounded-lg hover:bg-dark cursor-pointer text-xs" onclick="globalTicker='${t}';renderActiveTab()"><span class="font-mono font-bold">${t}</span><span class="font-mono">${p}</span><span class="font-bold ${u?'text-success':'text-danger'}">${c}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="card h-1/2 overflow-hidden flex flex-col">
+        <h3 class="text-[10px] font-black uppercase text-accent mb-2"><i class="fa-solid fa-bolt mr-1"></i>Scanner Hits</h3>
+        <div class="flex-1 scroll-y space-y-1.5 text-xs">
+          <div class="p-2 rounded-lg bg-success/10 border border-success/20"><div class="font-bold font-mono">NVDA</div><div class="text-[9px] text-gray-400">VWAP reclaim · 2.4M vol</div></div>
+          <div class="p-2 rounded-lg bg-success/10 border border-success/20"><div class="font-bold font-mono">AMD</div><div class="text-[9px] text-gray-400">Breakout · +7.9%</div></div>
+          <div class="p-2 rounded-lg bg-danger/10 border border-danger/20"><div class="font-bold font-mono">NFLX</div><div class="text-[9px] text-gray-400">Below VWAP</div></div>
+          <div class="p-2 rounded-lg bg-success/10 border border-success/20"><div class="font-bold font-mono">PLTR</div><div class="text-[9px] text-gray-400">Bull flag</div></div>
+          <div class="p-2 rounded-lg bg-gold/10 border border-gold/20"><div class="font-bold font-mono">SMCI</div><div class="text-[9px] text-gray-400">Squeeze alert</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Chart + News -->
+    <div class="col-span-6 flex flex-col gap-3">
+      <div class="card flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xs font-black uppercase text-accent"><i class="fa-solid fa-chart-area mr-1"></i>${globalTicker} · LIVE <span class="live-dot ml-2"></span></h3>
+          <div class="flex gap-1 text-[10px]">
+            ${['1m','5m','15m','1H','4H','1D'].map(tf=>`<button class="px-2 py-1 rounded ${tf==='1D'?'bg-accent text-white':'bg-dark text-gray-400'}">${tf}</button>`).join('')}
+          </div>
+        </div>
+        <canvas id="aioChart" class="flex-1"></canvas>
+      </div>
+      <div class="card h-32 overflow-hidden">
+        <h3 class="text-[10px] font-black uppercase text-accent mb-1.5"><i class="fa-solid fa-newspaper mr-1"></i>News Stream</h3>
+        <div class="scroll-y h-full space-y-1 text-xs">
+          ${NEWS_FEED.slice(0,5).map(n=>`<div><span class="text-gray-500 font-mono text-[9px]">${n.time}</span> <span class="font-bold font-mono">${n.ticker}</span> ${n.title}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Quick Trade + L2 + AI Read -->
+    <div class="col-span-3 space-y-3">
+      <div class="card">
+        <h3 class="text-[10px] font-black uppercase text-accent mb-2"><i class="fa-solid fa-bolt mr-1"></i>Quick Trade · ${globalTicker}</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="paperTrade('BUY',100)" class="btn bg-success text-white font-bold py-2.5"><i class="fa-solid fa-arrow-up mr-1"></i>BUY</button>
+          <button onclick="paperTrade('SELL',100)" class="btn bg-danger text-white font-bold py-2.5"><i class="fa-solid fa-arrow-down mr-1"></i>SELL</button>
+        </div>
+        <div class="mt-3 text-[10px] text-gray-400">Position size: <span class="text-white font-bold">100 shares</span></div>
+        <div class="mt-2 flex items-center gap-2 text-[10px]">
+          <span class="text-gray-500">Float:</span><span class="text-white font-bold">3.2B</span>
+        </div>
+        <div class="flex items-center gap-2 text-[10px]">
+          <span class="text-gray-500">RSI:</span><span class="text-white font-bold">62.4</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-[10px] font-black uppercase text-accent mb-2"><i class="fa-solid fa-layer-group mr-1"></i>Level 2</h3>
+        <div class="grid grid-cols-2 gap-2 font-mono text-[10px]">
+          <div>
+            <div class="text-success font-bold mb-1">BIDS</div>
+            <div class="flex justify-between text-danger"><span>399.05</span><span>1.2K</span></div>
+            <div class="flex justify-between text-danger"><span>399.00</span><span>3.4K</span></div>
+            <div class="flex justify-between text-danger"><span>398.95</span><span>5.8K</span></div>
+            <div class="flex justify-between text-danger"><span>398.90</span><span>8.1K</span></div>
+          </div>
+          <div>
+            <div class="text-danger font-bold mb-1">ASKS</div>
+            <div class="flex justify-between text-success"><span>399.20</span><span>900</span></div>
+            <div class="flex justify-between text-success"><span>399.25</span><span>2.1K</span></div>
+            <div class="flex justify-between text-success"><span>399.30</span><span>4.2K</span></div>
+            <div class="flex justify-between text-success"><span>399.35</span><span>6.5K</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-[10px] font-black uppercase text-accent mb-2"><i class="fa-solid fa-robot mr-1"></i>AI Read</h3>
+        <div class="space-y-1.5 text-xs">
+          <div class="flex justify-between"><span class="text-gray-400">Entry:</span><span class="text-white font-bold font-mono">$398.50</span></div>
+          <div class="flex justify-between"><span class="text-gray-400">Stop:</span><span class="text-danger font-bold font-mono">$391.20</span></div>
+          <div class="flex justify-between"><span class="text-gray-400">T1:</span><span class="text-success font-bold font-mono">$406.40</span></div>
+          <div class="flex justify-between"><span class="text-gray-400">T2:</span><span class="text-success font-bold font-mono">$412.80</span></div>
+          <div class="text-[10px] text-accent font-bold mt-2">↗ EMA9/21 bullish cross</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+// ============== PRO CHARTS ==============
+'pro-charts': () => {
+  const ind = INDICATORS_LIB;
+  const allInd = Object.entries(ind).flatMap(([cat, list]) => list.map(i => ({...i, _cat:cat})));
+  return `
+<div class="flex" style="height: calc(100vh - 90px)">
+  <!-- Left: Indicator Library -->
+  <div class="w-64 bg-panel border-r border-gray-800 flex flex-col flex-shrink-0">
+    <div class="p-3 border-b border-gray-800">
+      <h3 class="text-xs font-black uppercase text-accent tracking-wider mb-2"><i class="fa-solid fa-book mr-1"></i>Indicator Library</h3>
+      <div class="relative">
+        <i class="fa-solid fa-search absolute left-2.5 top-2 text-gray-500 text-[10px]"></i>
+        <input id="indSearch" type="text" placeholder="Search 27 indicators..." class="w-full bg-dark border border-gray-800 rounded pl-7 pr-2 py-1.5 text-[11px] focus:outline-none focus:border-accent" oninput="filterIndicators(this.value)">
+      </div>
+    </div>
+    <div class="flex border-b border-gray-800 text-[10px] font-bold overflow-x-auto" id="indCats">
+      <button onclick="setIndCat('All')" class="px-3 py-1.5 text-accent border-b-2 border-accent">All</button>
+      ${Object.keys(ind).map(c=>`<button onclick="setIndCat('${c}')" class="px-3 py-1.5 text-gray-400 hover:text-white whitespace-nowrap">${c}</button>`).join('')}
+    </div>
+    <div class="flex-1 scroll-y p-2 space-y-0.5" id="indList">
+      ${allInd.map(i => `
+        <div class="indicator-cell p-2 rounded-lg border border-transparent text-[11px]" onclick="toggleIndicator('${i.id}','${i._cat}')" data-cat="${i._cat}" data-name="${i.name.toLowerCase()}">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full" style="background:${i.color}"></span>
+            <span class="font-bold flex-1">${i.name}</span>
+            <span class="text-[9px] text-gray-500 tag">${i._cat}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="p-3 border-t border-gray-800">
+      <div class="text-[10px] text-gray-500 font-bold uppercase mb-2">Active on Chart</div>
+      <div id="activeInds" class="flex flex-wrap gap-1">
+        ${proChartsIndicators.map(id=>{
+          const i = allInd.find(x=>x.id===id);
+          return i ? `<span class="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded font-bold flex items-center gap-1">${i.name}<button onclick="toggleIndicator('${id}','${i._cat}')" class="hover:text-white">×</button></span>` : '';
+        }).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Center: Chart + Timeframe + Drawing Tools -->
+  <div class="flex-1 flex flex-col bg-dark">
+    <div class="bg-panel border-b border-gray-800 px-3 py-2 flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded bg-accent/20 flex items-center justify-center text-accent font-bold text-xs">${proChartsSymbol.slice(0,4)}</div>
+        <div>
+          <div class="text-sm font-black">${proChartsSymbol}</div>
+          <div class="text-[9px] text-gray-500">Equity · US · LIVE</div>
+        </div>
+      </div>
+      <div class="text-lg font-mono font-black ml-3" id="pcPrice">$295.63</div>
+      <div class="text-xs font-bold text-success">+1.39%</div>
+      <div class="flex-1"></div>
+      <div class="flex gap-0.5 bg-dark rounded p-0.5">
+        ${['1m','5m','15m','1H','4H','1D','1W'].map(tf=>`<button onclick="setProChartTF('${tf}')" class="px-2.5 py-1 rounded text-[10px] font-bold ${proChartsTimeframe===tf?'bg-accent text-white':'text-gray-400 hover:text-white'}">${tf}</button>`).join('')}
+      </div>
+      <div class="flex gap-1">
+        ${[{i:'fa-chart-line',t:'Line',a:'line'},{i:'fa-grip-lines-vertical',t:'Candle',a:'candle'},{i:'fa-chart-bar',t:'Heikin',a:'heikin'}].map(b=>`<button onclick="setProChartType('${b.a}')" class="px-2 py-1 text-[10px] text-gray-400 hover:text-white"><i class="fa-solid ${b.i}"></i></button>`).join('')}
+      </div>
+      <div class="flex gap-1 ml-2 border-l border-gray-800 pl-2">
+        ${[{i:'fa-pen',t:'Cursor'},{i:'fa-arrow-trend-up',t:'Trend'},{i:'fa-ruler',t:'Measure'},{i:'fa-font',t:'Text'},{i:'fa-square',t:'Box'}].map(b=>`<button class="px-2 py-1 text-[10px] text-gray-400 hover:text-white" title="${b.t}"><i class="fa-solid ${b.i}"></i></button>`).join('')}
+      </div>
+      <button onclick="captureChart()" class="btn btn-ghost text-[10px]" title="Screenshot"><i class="fa-solid fa-camera"></i></button>
+      <button onclick="openProChartFullscreen()" class="btn btn-ghost text-[10px]" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+    </div>
+
+    <div class="flex-1 relative">
+      <canvas id="proChart" class="absolute inset-0 w-full h-full"></canvas>
+      <div class="absolute top-2 right-2 flex items-center gap-2 text-[10px] font-mono">
+        <span class="tag bg-success/20 text-success"><span class="live-dot"></span> MARKET OPEN</span>
+      </div>
+      <div class="absolute bottom-2 left-2 text-[9px] text-gray-500 font-mono">
+        ${proChartsIndicators.map(id=>{
+          const i = Object.values(INDICATORS_LIB).flat().find(x=>x.id===id);
+          return i ? `<span style="color:${i.color}" class="mr-2">● ${i.name.split(' ')[0]}</span>` : '';
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="bg-panel border-t border-gray-800 px-3 py-2 flex items-center gap-4 text-[10px]">
+      <span class="text-gray-500">O: <span class="text-white">293.80</span></span>
+      <span class="text-gray-500">H: <span class="text-success">297.45</span></span>
+      <span class="text-gray-500">L: <span class="text-danger">292.10</span></span>
+      <span class="text-gray-500">C: <span class="text-white font-bold">295.63</span></span>
+      <span class="text-gray-500">Vol: <span class="text-white">42.8M</span></span>
+      <span class="text-gray-500">Float: <span class="text-white">15.7B</span></span>
+      <span class="text-gray-500">ATR: <span class="text-white">4.82</span></span>
+      <span class="text-gray-500">RSI: <span class="text-white">62.4</span></span>
+    </div>
+  </div>
+
+  <!-- Right: Active indicator help / details -->
+  <div class="w-72 bg-panel border-l border-gray-800 scroll-y flex-shrink-0">
+    <div class="p-3 border-b border-gray-800">
+      <h3 class="text-xs font-black uppercase text-accent tracking-wider"><i class="fa-solid fa-graduation-cap mr-1"></i>How To Read</h3>
+    </div>
+    <div id="indHelpPanel" class="p-3 space-y-3 text-xs">
+      ${proChartsIndicators.length ? INDICATORS_LIB.Trend.concat(INDICATORS_LIB.Momentum, INDICATORS_LIB.Volume).filter(i=>proChartsIndicators.includes(i.id)).map(i=>`
+        <div class="p-3 rounded-lg border border-gray-800 bg-panel-2">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="w-2 h-2 rounded-full" style="background:${i.color}"></span>
+            <span class="font-black text-white">${i.name}</span>
+            <span class="tag bg-gray-800 text-gray-400 ml-auto">${i.cat}</span>
+          </div>
+          <p class="text-gray-300 leading-relaxed mb-2">${i.desc}</p>
+          <div class="p-2 rounded bg-dark/50 border-l-2 border-accent">
+            <div class="text-[9px] text-accent font-black uppercase mb-1">📐 What It Measures</div>
+            <p class="text-[11px] text-gray-300">${i.desc}</p>
+          </div>
+          <div class="p-2 rounded bg-dark/50 border-l-2 border-success mt-2">
+            <div class="text-[9px] text-success font-black uppercase mb-1">🎯 How To Read &amp; Trade</div>
+            <p class="text-[11px] text-gray-300">${i.read}</p>
+            <p class="text-[11px] text-gray-400 italic mt-1"><strong>Use:</strong> ${i.use}</p>
+          </div>
+        </div>
+      `).join('') : '<div class="text-gray-500 text-center py-8">Click an indicator on the left to see its detailed explanation here.</div>'}
+    </div>
+    <div class="p-3 border-t border-gray-800">
+      <h4 class="text-[10px] font-black uppercase text-accent mb-2"><i class="fa-solid fa-chart-pie mr-1"></i>Indicator Categories</h4>
+      <div class="grid grid-cols-2 gap-1 text-[10px]">
+        ${Object.entries(INDICATORS_LIB).map(([cat, list])=>`<div class="p-2 rounded bg-panel-2 border border-gray-800"><div class="font-bold text-accent">${cat}</div><div class="text-gray-500">${list.length} indicators</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>
+`;
+},
+
+// ============== CANDLES (with 38 patterns sub-tab) ==============
+candles: () => `
+<div class="p-5 space-y-5">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-fire text-accent"></i>Candle Encyclopedia &amp; Chart Patterns</h1>
+      <p class="text-xs text-gray-500 mt-1">Single, double &amp; triple candle reversals · continuations · indecisions · 38 chart patterns</p>
+    </div>
+  </div>
+
+  <!-- Sub-tabs -->
+  <div class="flex border-b border-gray-800 gap-0.5">
+    <button onclick="setCandleSub('candles')" class="px-4 py-2 text-xs font-black ${activeCandleSub==='candles'?'text-accent border-b-2 border-accent bg-accent/5':'text-gray-400 hover:text-white'}"><i class="fa-solid fa-fire mr-1"></i>Candlestick Patterns (26)</button>
+    <button onclick="setCandleSub('patterns38')" class="px-4 py-2 text-xs font-black ${activeCandleSub==='patterns38'?'text-accent border-b-2 border-accent bg-accent/5':'text-gray-400 hover:text-white'}"><i class="fa-solid fa-chart-area mr-1"></i>Chart Patterns (38)</button>
+  </div>
+
+  ${activeCandleSub==='candles' ? renderCandles26() : renderPatterns38()}
+</div>
+`,
+
+// ============== GLOBAL MARKETS ==============
+'global-markets': () => `
+<div class="p-6 space-y-5">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-globe text-accent"></i>Global Markets</h1>
+      <p class="text-xs text-gray-500 mt-1">US indices · International markets · Futures · Crypto · All live</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent tracking-wider mb-3">🇺🇸 US Indices &amp; Futures</h3>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      ${[
+        ['S&amp;P 500','SPX','7,394.12','+1.70%',true],['Nasdaq 100','NDX','29,446.55','+3.38%',true],
+        ['Dow Jones','DJI','50,848.20','+0.92%',true],['Russell 2000','RUT','2,921.45','+1.85%',true],
+        ['VIX','VIX','19.44','-2.10%',false],['DXY','DXY','104.18','-0.32%',false],
+        ['ES Futures','ES','7,402.50','+0.13%',true],['NQ Futures','NQ','29,455.25','+0.04%',true],
+        ['YM Futures','YM','50,860','+0.13%',true],['RTY Futures','RTY','2,925.40','+0.18%',true],
+      ].map(([n,s,p,c,u])=>`<div class="p-3 rounded-lg bg-panel-2 border border-gray-800 hover:border-accent cursor-pointer" onclick="globalTicker='${s}';switchTab('symbol-detail')"><div class="text-[9px] text-gray-500 font-bold">${n}</div><div class="text-xs font-mono font-bold text-white">${p}</div><div class="text-[10px] font-bold ${u?'text-success':'text-danger'}">${c}</div></div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent tracking-wider mb-3">🌍 International Markets</h3>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      ${[
+        ['FTSE 100 (UK)','7,694.12','+0.45%',true],['DAX 40 (Germany)','16,689.45','+0.78%',true],
+        ['Nikkei 225 (Japan)','33,618.45','+1.20%',true],['Hang Seng (HK)','16,234.78','+0.92%',true],
+        ['Shanghai Composite','3,012.45','+0.35%',true],['Kospi (Korea)','2,584.10','+0.82%',true],
+        ['ASX 200 (Australia)','7,892.30','+0.28%',true],['TSX (Canada)','22,485.60','+0.45%',true],
+        ['CAC 40 (France)','7,485.20','+0.32%',true],['Euro Stoxx 50','4,892.15','+0.55%',true],
+      ].map(([n,p,c,u])=>`<div class="p-3 rounded-lg bg-panel-2 border border-gray-800 hover:border-accent cursor-pointer"><div class="text-[9px] text-gray-500 font-bold">${n}</div><div class="text-xs font-mono font-bold text-white">${p}</div><div class="text-[10px] font-bold ${u?'text-success':'text-danger'}">${c}</div></div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent tracking-wider mb-3">₿ Crypto · Live</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${CRYPTO_TOP.map(c=>`<div class="p-3 rounded-lg bg-panel-2 border border-gray-800 hover:border-accent cursor-pointer" onclick="globalTicker='${c.sym}';switchTab('crypto-onchain')"><div class="text-[9px] text-gray-500 font-bold">${c.sym}</div><div class="text-xs font-mono font-bold text-white">${c.price}</div><div class="text-[10px] font-bold ${c.chg.startsWith('+')?'text-success':'text-danger'}">${c.chg}</div></div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent tracking-wider mb-3">⛏️ Commodities</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${[['Gold','$4,222','+2.63%',true],['Silver','$67.38','+5.28%',true],['Crude Oil','$86.74','+1.85%',true],['Natural Gas','$3.08','-0.42%',false],['Copper','$6.42','+0.85%',true],['Platinum','$980.50','+0.40%',true],['Wheat','$5.85','-1.45%',false],['Corn','$4.35','+0.25%',true]].map(([n,p,c,u])=>`<div class="p-3 rounded-lg bg-panel-2 border border-gray-800 hover:border-accent cursor-pointer"><div class="text-[9px] text-gray-500 font-bold">${n}</div><div class="text-xs font-mono font-bold text-white">${p}</div><div class="text-[10px] font-bold ${u?'text-success':'text-danger'}">${c}</div></div>`).join('')}
+    </div>
+  </div>
+</div>
+`,
+
+// ============== SYMBOL DETAIL ==============
+'symbol-detail': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-lg bg-accent/20 flex items-center justify-center text-accent font-black">${globalTicker.slice(0,4)}</div>
+      <div>
+        <h1 class="text-2xl font-black">${globalTicker} · Equity</h1>
+        <div class="text-xs text-gray-500 flex items-center gap-2">
+          <span class="text-success font-bold font-mono text-base">$295.63</span>
+          <span class="text-success font-bold">+1.39%</span>
+          <span class="live-dot"></span> <span class="text-success">LIVE</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="globalTicker='NVDA';renderActiveTab()" class="btn btn-ghost">NVDA</button>
+      <button onclick="globalTicker='TSLA';renderActiveTab()" class="btn btn-ghost">TSLA</button>
+      <button onclick="globalTicker='BTC';renderActiveTab()" class="btn btn-ghost">BTC</button>
+      <button onclick="switchTab('pro-charts')" class="btn btn-primary"><i class="fa-solid fa-chart-area mr-1"></i>Pro Chart</button>
+    </div>
+  </div>
+
+  <!-- Sub-tabs -->
+  <div class="flex border-b border-gray-800 gap-0.5">
+    ${['overview','technical','fundamentals','profile','news'].map(s=>`<button onclick="setSymbolDetailSub('${s}')" class="px-4 py-2 text-xs font-black ${activeSymbolDetailSub===s?'text-accent border-b-2 border-accent bg-accent/5':'text-gray-400 hover:text-white'} capitalize">${s}</button>`).join('')}
+  </div>
+
+  ${activeSymbolDetailSub==='overview' ? renderSymbolOverview() :
+    activeSymbolDetailSub==='technical' ? renderSymbolTA() :
+    activeSymbolDetailSub==='fundamentals' ? renderSymbolFundamentals() :
+    activeSymbolDetailSub==='profile' ? renderSymbolProfile() :
+    renderSymbolNews()}
+</div>
+`,
+
+// ============== SCANNER ==============
+scanner: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-radar text-accent"></i>Universal Scanner</h1>
+      <p class="text-xs text-gray-500 mt-1">Real-time stock, crypto &amp; forex scan with custom filters</p>
+    </div>
+    <button class="btn btn-primary"><i class="fa-solid fa-play mr-1"></i>Run Scan</button>
+  </div>
+  <div class="card">
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-4">
+      <div><label class="text-[9px] text-gray-500 font-bold uppercase">Price Range</label><select class="input"><option>$1 - $500</option></select></div>
+      <div><label class="text-[9px] text-gray-500 font-bold uppercase">Volume &gt;</label><input type="text" value="500K" class="input"></div>
+      <div><label class="text-[9px] text-gray-500 font-bold uppercase">Float &lt;</label><input type="text" value="20M" class="input"></div>
+      <div><label class="text-[9px] text-gray-500 font-bold uppercase">RSI</label><input type="text" value="30-70" class="input"></div>
+      <div><label class="text-[9px] text-gray-500 font-bold uppercase">Gap %</label><input type="text" value=">2%" class="input"></div>
+      <div><label class="text-[9px] text-gray-500 font-bold uppercase">Market</label><select class="input"><option>Stocks</option><option>Crypto</option><option>Forex</option></select></div>
+    </div>
+    <table class="w-full text-xs">
+      <thead><tr class="text-[9px] text-gray-500 uppercase border-b border-gray-800">
+        <th class="text-left py-2">Ticker</th><th class="text-left">Name</th><th class="text-right">Price</th><th class="text-right">Change</th><th class="text-right">Vol</th><th class="text-right">Float</th><th class="text-right">RSI</th><th class="text-center">Action</th>
+      </tr></thead>
+      <tbody>
+        ${[
+          ['NVDA','NVIDIA',295.63,1.39,204.87,15.7,62.4],['AMD','AMD',488.45,7.97,42.1,1.6,72.5],
+          ['TSLA','Tesla',399.15,4.60,108.4,2.8,58.3],['AAPL','Apple',295.63,1.39,42.8,15.7,55.2],
+          ['PLTR','Palantir',28.40,6.40,82.3,0.9,68.4],['SMCI','Super Micro',42.80,9.20,15.2,0.6,71.8],
+          ['ARM','ARM Holdings',135.20,4.80,8.4,1.2,66.1],['META','Meta',568.43,-0.45,18.2,2.4,48.2],
+          ['NFLX','Netflix',81.27,-0.89,4.8,0.4,42.5],['BTC','Bitcoin',63388,2.40,0,0,58.4],
+          ['SOL','Solana',66.86,5.20,0,0,62.1],['ETH','Ethereum',1670,2.10,0,0,55.8],
+        ].map(([t,n,p,c,v,f,r])=>`<tr class="border-b border-gray-800/50 hover:bg-dark/40"><td class="py-2 font-bold font-mono">${t}</td><td>${n}</td><td class="text-right font-mono">$${p.toLocaleString()}</td><td class="text-right font-bold ${c>=0?'text-success':'text-danger'}">${c>=0?'+':''}${c}%</td><td class="text-right font-mono">${v}M</td><td class="text-right font-mono">${f}B</td><td class="text-right font-mono">${r}</td><td class="text-center"><button onclick="globalTicker='${t}';switchTab('pro-charts')" class="btn btn-ghost text-[10px]">Chart</button></td></tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>
+`,
+
+'short-interest': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-arrow-down-short-wide text-accent"></i>Short Interest Scanner</h1>
+      <p class="text-xs text-gray-500 mt-1">Top 50 most shorted stocks — squeeze candidates</p>
+    </div>
+  </div>
+  <div class="card">
+    <table class="w-full text-xs">
+      <thead><tr class="text-[9px] text-gray-500 uppercase border-b border-gray-800">
+        <th class="text-left py-2">#</th><th class="text-left">Ticker</th><th class="text-left">Name</th><th class="text-right">SI %</th><th class="text-right">DTC</th><th class="text-right">Float</th><th class="text-right">Borrow %</th>
+      </tr></thead>
+      <tbody>
+        ${[
+          [1,'GME','GameStop',23.4,5.2,74.5M,12.5],[2,'BMNR','Bitmine',28.7,7.8,42.1M,15.2],
+          [3,'SPWR','SunPower',31.2,8.4,55.0M,18.4],[4,'PLTR','Palantir',12.4,3.2,1.85B,4.8],
+          [5,'SMCI','Super Micro',18.5,4.8,605M,9.2],[6,'BYND','Beyond Meat',24.8,6.2,118M,11.4],
+          [7,'RIOT','Riot Platforms',22.5,5.8,210M,8.9],[8,'MARA','Marathon',20.4,5.4,194M,8.4],
+          [9,'WBA','Walgreens',18.2,4.6,860M,7.2],[10,'CVNA','Carvana',19.8,5.2,108M,9.8],
+          [11,'UPST','Upstart',15.4,3.8,84M,6.2],[12,'LCID','Lucid',17.2,4.4,3.5B,5.8],
+          [13,'RIVN','Rivian',14.8,3.6,1.1B,5.4],[14,'FFIE','Faraday Future',42.5,12.8,42M,28.4],
+          [15,'NIO','NIO',12.8,3.4,1.4B,4.5],
+        ].map(([r,t,n,s,d,f,b])=>`<tr class="border-b border-gray-800/50 hover:bg-dark/40"><td class="py-2 text-gray-500">#${r}</td><td class="font-bold font-mono cursor-pointer hover:text-accent" onclick="globalTicker='${t}';switchTab('pro-charts')">${t}</td><td>${n}</td><td class="text-right text-danger font-bold">${s}%</td><td class="text-right font-mono">${d}d</td><td class="text-right font-mono">${f}M</td><td class="text-right text-gold font-bold">${b}%</td></tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>
+`,
+
+premarket: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-sun text-accent"></i>Pre-Market Movers</h1>
+      <p class="text-xs text-gray-500 mt-1">Top gappers before the bell · 4:00 AM - 9:30 AM ET</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-success mb-3"><i class="fa-solid fa-arrow-up mr-1"></i>Top Gappers Up</h3>
+      <div class="space-y-2">
+        ${[['NVDA','+5.8%','$215.40'],['SMCI','+9.2%','$46.75'],['PLTR','+6.4%','$30.20'],['AMD','+7.9%','$525.80'],['ARM','+4.8%','$141.50'],['TSLA','+3.4%','$412.80'],['COIN','+4.2%','$238.50'],['AAPL','+1.8%','$300.80']].map(([t,c,p])=>`<div class="flex justify-between p-2 rounded bg-success/10 border border-success/20"><span class="font-mono font-bold">${t}</span><span class="font-mono">${p}</span><span class="text-success font-bold">${c}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-danger mb-3"><i class="fa-solid fa-arrow-down mr-1"></i>Top Gappers Down</h3>
+      <div class="space-y-2">
+        ${[['NFLX','-3.4%','$78.50'],['INTC','-4.2%','$22.10'],['PYPL','-3.8%','$65.40'],['DIS','-2.8%','$91.20'],['BA','-2.4%','$185.60'],['NKE','-2.1%','$78.90'],['SBUX','-1.8%','$84.30'],['WBA','-5.2%','$9.80']].map(([t,c,p])=>`<div class="flex justify-between p-2 rounded bg-danger/10 border border-danger/20"><span class="font-mono font-bold">${t}</span><span class="font-mono">${p}</span><span class="text-danger font-bold">${c}</span></div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+// ============== AI CHART ENGINE ==============
+'ai-charts': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-robot text-accent"></i>AI Chart Engine</h1>
+      <p class="text-xs text-gray-500 mt-1">Pattern recognition · Smart entry/stop/target generation · Options desk</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <input id="aiSearch" placeholder="Symbol..." class="input w-32" onkeydown="if(event.key==='Enter'){globalTicker=this.value.toUpperCase();renderActiveTab()}">
+      <button onclick="const s=document.getElementById('aiSearch');globalTicker=s.value.toUpperCase()||'AAPL';renderActiveTab()" class="btn btn-primary">Load</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="lg:col-span-2 card">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl font-black">${globalTicker}</span>
+          <span class="text-success font-bold font-mono">$295.63</span>
+          <span class="text-success text-xs font-bold">+1.39%</span>
+          <span class="live-dot ml-2"></span>
+        </div>
+        <div class="flex gap-1">
+          ${['1m','5m','15m','1H','4H','1D'].map(tf=>`<button class="px-2 py-1 rounded text-[10px] ${tf==='5m'?'bg-accent text-white':'bg-dark text-gray-400'}">${tf}</button>`).join('')}
+        </div>
+      </div>
+      <canvas id="aiChart" height="280"></canvas>
+      <div class="grid grid-cols-6 gap-2 mt-3 text-xs">
+        <div class="p-2 rounded bg-panel-2 text-center"><div class="text-[9px] text-gray-500">Entry</div><div class="text-white font-bold font-mono">$293.20</div></div>
+        <div class="p-2 rounded bg-panel-2 text-center"><div class="text-[9px] text-gray-500">Stop</div><div class="text-danger font-bold font-mono">$287.40</div></div>
+        <div class="p-2 rounded bg-panel-2 text-center"><div class="text-[9px] text-gray-500">T1</div><div class="text-success font-bold font-mono">$304.50</div></div>
+        <div class="p-2 rounded bg-panel-2 text-center"><div class="text-[9px] text-gray-500">T2</div><div class="text-success font-bold font-mono">$312.80</div></div>
+        <div class="p-2 rounded bg-panel-2 text-center"><div class="text-[9px] text-gray-500">R:R</div><div class="text-accent font-bold font-mono">5:1</div></div>
+        <div class="p-2 rounded bg-panel-2 text-center"><div class="text-[9px] text-gray-500">Float</div><div class="text-white font-bold font-mono">15.7B</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3"><i class="fa-solid fa-water mr-1"></i>Options Desk · IV 25% · 30 DTE</h3>
+      <div class="flex flex-wrap gap-1 mb-3">
+        ${['Long Call','Long Put','Bull Spread','Bear Spread','Iron Condor','Straddle','Strangle','Covered Call'].map(s=>`<button class="px-2 py-1 rounded text-[10px] bg-dark text-gray-400 hover:bg-accent hover:text-white">${s}</button>`).join('')}
+      </div>
+      <div class="space-y-2 text-xs">
+        <div class="p-2 rounded bg-success/10 border border-success/20"><div class="text-[9px] text-gray-500">Long Call 30d</div><div class="flex justify-between font-bold"><span>Strike $295</span><span class="text-success">+$1.85 Δ 0.52</span></div></div>
+        <div class="p-2 rounded bg-success/10 border border-success/20"><div class="text-[9px] text-gray-500">Long Call 30d</div><div class="flex justify-between font-bold"><span>Strike $300</span><span class="text-success">+$0.95 Δ 0.42</span></div></div>
+        <div class="p-2 rounded bg-danger/10 border border-danger/20"><div class="text-[9px] text-gray-500">Long Put 30d</div><div class="flex justify-between font-bold"><span>Strike $290</span><span class="text-danger">+$1.20 Δ -0.45</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+// ============== PAPER TRADING ==============
+'paper-trading': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-flask text-accent"></i>Paper Trading Sandbox</h1>
+      <p class="text-xs text-gray-500 mt-1">Execute all strategies risk-free with $100K simulated capital</p>
+    </div>
+    <div class="text-right">
+      <div class="text-[10px] text-gray-500 uppercase font-bold">Account Balance</div>
+      <div class="text-2xl font-black text-success">$101,684</div>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3"><i class="fa-solid fa-bolt mr-1"></i>Quick Order</h3>
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[9px] text-gray-500 font-bold uppercase">Symbol</label><input class="input" value="AAPL"></div>
+          <div><label class="text-[9px] text-gray-500 font-bold uppercase">Quantity</label><input class="input" type="number" value="100"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="paperTrade('BUY',100)" class="btn bg-success text-white font-bold py-3"><i class="fa-solid fa-arrow-up mr-1"></i>BUY</button>
+          <button onclick="paperTrade('SELL',100)" class="btn bg-danger text-white font-bold py-3"><i class="fa-solid fa-arrow-down mr-1"></i>SELL</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3"><i class="fa-solid fa-list mr-1"></i>Open Positions</h3>
+      <div class="space-y-2 text-xs">
+        ${[
+          ['NVDA','BUY 100',201.40,'+2.4%','+$848'],['AMD','BUY 50',462.10,'+5.7%','+$1,318'],
+          ['AAPL','BUY 100',288.20,'+2.6%','+$743'],['SOL','BUY 25',63.50,'+5.3%','+$84'],
+        ].map(([t,q,p,c,pl])=>`<div class="flex justify-between p-2 rounded bg-success/10 border border-success/20"><span class="font-mono font-bold">${t}</span><span class="text-gray-400">${q} @ $${p}</span><span class="${pl.startsWith('+')?'text-success':'text-danger'} font-bold">${pl}</span></div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+'multi-chart': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-table-cells text-accent"></i>Multi-Chart Layout</h1>
+      <p class="text-xs text-gray-500 mt-1">Compare multiple symbols across timeframes simultaneously</p>
+    </div>
+    <div class="flex gap-1 bg-panel rounded p-1">
+      ${['1x1','2x1','2x2','3x2'].map(l=>`<button class="px-3 py-1 text-[10px] rounded ${l==='2x2'?'bg-accent text-white':'text-gray-400'}">${l}</button>`).join('')}
+    </div>
+  </div>
+  <div class="grid grid-cols-2 grid-rows-2 gap-3" style="height:calc(100vh - 220px)">
+    ${['TSLA','AAPL','NVDA','AMD'].map((t,i)=>`
+      <div class="card relative flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <input class="bg-dark border border-gray-800 rounded px-2 py-1 text-xs font-bold font-mono w-20 focus:outline-none focus:border-accent" value="${t}" onchange="this.value=this.value.toUpperCase();this.parentElement.querySelector('canvas').id='mc'+Math.random()">
+          <span class="text-xs font-mono font-bold text-success">$395.${10+i}5</span>
+          <span class="live-dot"></span>
+        </div>
+        <canvas id="mc${i}" class="flex-1"></canvas>
+      </div>
+    `).join('')}
+  </div>
+</div>
+`,
+
+'smart-stop': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-shield-halved text-accent"></i>Smart Stop Manager</h1>
+      <p class="text-xs text-gray-500 mt-1">Active position monitoring with intelligent trailing stops</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">Active Stops</h3>
+    <div class="space-y-2">
+      ${[['NVDA','BUY 100','ATR Trail',287.50,'+$848'],['AMD','BUY 50','VWAP Trail',478.20,'+$1,318'],['AAPL','BUY 100','ORB Stop',291.40,'+$743']].map(([t,q,s,p,pl])=>`<div class="grid grid-cols-12 gap-3 items-center p-2 rounded bg-panel-2"><div class="col-span-2 font-bold font-mono">${t}</div><div class="col-span-2 text-gray-400">${q}</div><div class="col-span-2 text-accent text-[10px] font-bold uppercase">${s}</div><div class="col-span-2 font-mono">${p}</div><div class="col-span-2 ${pl.startsWith('+')?'text-success':'text-danger'} font-bold">${pl}</div><div class="col-span-2 text-right"><button class="btn btn-ghost text-[10px]">Adjust</button></div></div>`).join('')}
+    </div>
+  </div>
+</div>
+`,
+
+// ============== ANALYTICS ==============
+backtest: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-chart-line text-accent"></i>Advanced Backtesting</h1>
+      <p class="text-xs text-gray-500 mt-1">Test strategies on 10 years of historical data with Monte Carlo</p>
+    </div>
+    <button class="btn btn-primary"><i class="fa-solid fa-play mr-1"></i>Run Backtest</button>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="card lg:col-span-2">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Equity Curve</h3>
+      <canvas id="btChart" height="220"></canvas>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Performance</h3>
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between"><span class="text-gray-400">Total Trades:</span><span class="font-bold">1,247</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Win Rate:</span><span class="text-success font-bold">61.3%</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Profit Factor:</span><span class="text-accent font-bold">2.14</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Sharpe:</span><span class="text-gold font-bold">2.18</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Sortino:</span><span class="text-gold font-bold">3.02</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Calmar:</span><span class="text-gold font-bold">4.18</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Max DD:</span><span class="text-danger font-bold">-6.4%</span></div>
+        <div class="flex justify-between"><span class="text-gray-400">Expectancy:</span><span class="text-success font-bold">$87</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+correlation: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-circle-nodes text-accent"></i>Correlation Matrix</h1>
+      <p class="text-xs text-gray-500 mt-1">Multi-asset correlation heatmap (30-day rolling)</p>
+    </div>
+  </div>
+  <div class="card overflow-x-auto">
+    <table class="text-xs">
+      <thead><tr><th class="p-2"></th>${['SPY','QQQ','IWM','TLT','GLD','BTC','ETH','VIX'].map(a=>`<th class="p-2 text-[10px] text-gray-400">${a}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${[['SPY',1,.92,.85,-.42,.12,.42,-.78],['QQQ',.92,1,.78,-.35,.08,.48,-.72],['IWM',.85,.78,1,-.30,.15,.40,-.68],['TLT',-.42,-.35,-.30,1,-.18,-.22,.45],['GLD',.12,.08,.15,-.18,1,.35,-.20],['BTC',.42,.48,.40,-.22,.35,1,-.50],['ETH',.45,.50,.42,-.20,.40,.92,1],['VIX',-.78,-.72,-.68,.45,-.20,-.50,-.55]].map((row,i)=>`<tr>${row.map((v,j)=>`<td class="p-2 ${i===j?'bg-gray-800':'bg-panel-2'} border border-gray-800" style="background:${i===j?'#1f2330':'rgba('+(v>=0?'139,92,246':'239,68,68')+','+Math.abs(v)*0.6+')'};color:${Math.abs(v)>0.6?'#fff':'#9ca3af'}">${v.toFixed(2)}</td>`).join('')}</tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>
+`,
+
+regime: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-compass text-accent"></i>Market Regime Detector</h1>
+      <p class="text-xs text-gray-500 mt-1">Identify current market regime and optimal strategies</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    ${[{n:'Bull Trend',s:'RISK-ON',c:'success',d:'Up trend · buy dips'}, {n:'Bear Trend',s:'RISK-OFF',c:'danger',d:'Down trend · short rallies'}, {n:'Range/Chop',s:'NEUTRAL',c:'gold',d:'Sideways · mean revert'}, {n:'High Vol',s:'DEFENSIVE',c:'accent',d:'Volatile · reduce size'}].map(r=>`<div class="card text-center"><div class="text-[9px] text-gray-500 uppercase font-bold">${r.n}</div><div class="text-2xl font-black mt-2 text-${r.c}">${r.s}</div><div class="text-[10px] text-gray-400 mt-2">${r.d}</div></div>`).join('')}
+  </div>
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">Current Regime · BULL TREND (Active)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <div class="text-[10px] text-success font-black uppercase mb-2">✅ Recommended Strategies</div>
+        <ul class="text-xs space-y-1 text-gray-300">
+          <li>• Trend following (EMA9/21 cross)</li>
+          <li>• VWAP pullback entries</li>
+          <li>• Breakout trades (volume confirmed)</li>
+          <li>• Add to longs on weakness</li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[10px] text-danger font-black uppercase mb-2">⛔ Avoid</div>
+        <ul class="text-xs space-y-1 text-gray-300">
+          <li>• Counter-trend shorts</li>
+          <li>• Mean reversion at highs</li>
+          <li>• Iron condors (will lose on trend)</li>
+          <li>• Tight stops (will get run over)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+signals: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-signal text-accent"></i>Signal Performance Tracker</h1>
+      <p class="text-xs text-gray-500 mt-1">Track win rate by setup, timeframe &amp; market condition</p>
+    </div>
+  </div>
+  <div class="card">
+    <canvas id="sigChart" height="220"></canvas>
+  </div>
+</div>
+`,
+
+fib: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-calculator text-accent"></i>Fibonacci &amp; Pivot Calculator</h1>
+      <p class="text-xs text-gray-500 mt-1">Calculate key support/resistance levels dynamically</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div><label class="text-[9px] text-gray-500 font-bold uppercase">Swing High</label><input id="fh" type="number" value="310" class="input"></div>
+    <div><label class="text-[9px] text-gray-500 font-bold uppercase">Swing Low</label><input id="fl" type="number" value="280" class="input"></div>
+    <div><label class="text-[9px] text-gray-500 font-bold uppercase">Prev Close</label><input id="fc" type="number" value="295" class="input"></div>
+  </div>
+  <button onclick="recalcFib()" class="btn btn-primary"><i class="fa-solid fa-rotate mr-1"></i>Recalculate</button>
+  <div id="fibResults" class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4"></div>
+</div>
+`,
+
+tpo: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-bars-staggered text-accent"></i>TPO Market Profile</h1>
+      <p class="text-xs text-gray-500 mt-1">Time-Price-Opportunity auction profile · POC · VAH/VAL</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="lg:col-span-2 card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">📊 TPO Chart (5-minute bars)</h3>
+      <div class="font-mono text-[10px] leading-relaxed bg-dark p-4 rounded-lg border border-gray-800">
+        ${['$305|TTTTT','$300|TTTTTTTTTT','$295|TTTTTTTTTTTTTTTTT','$290|TTTTTTTTTTTTTTTTTTTTTT','$285|TTTTTTTTTTTTTTTTTTTTTTTTTTTTT  <-- [🟡 POC]','$280|TTTTTTTTTTTTTTTTTTTT','$275|TTTTTTTTTTTT','$270|TTTTTTTT','$265|TTTT'].map(l=>`<div class="text-gray-400">${l.includes('POC')?'<span class="text-gold font-bold">'+l+'</span>':l}</div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Key Levels</h3>
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between"><span class="text-gold">POC:</span><span class="font-bold">$285.00</span></div>
+        <div class="flex justify-between"><span class="text-accent">VAH:</span><span class="font-bold">$295.00</span></div>
+        <div class="flex justify-between"><span class="text-accent">VAL:</span><span class="font-bold">$275.00</span></div>
+        <div class="flex justify-between"><span>Range:</span><span class="font-bold">$25.00</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+// ============== CRYPTO ==============
+'crypto-dash': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-brands fa-bitcoin text-accent"></i>Crypto Dashboard</h1>
+      <p class="text-xs text-gray-500 mt-1">Fear &amp; Greed · Dominance · Top movers · All prices</p>
+    </div>
+    <span class="tag bg-success/15 text-success"><span class="live-dot"></span> CoinGecko LIVE</span>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+    <div class="card lg:col-span-2">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-xs font-black uppercase text-accent">CRYPTO FEAR &amp; GREED</h3>
+        <span class="text-[10px] text-gray-500">Updated daily via Alternative.me</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-5xl font-black">12</div>
+          <div class="text-sm text-danger font-bold">/ 100 · Extreme Fear</div>
+        </div>
+        <canvas id="fgGauge" width="220" height="130"></canvas>
+      </div>
+      <div class="mt-3 p-3 rounded bg-success/10 border border-success/20 text-xs">
+        <span class="text-success font-black">🟢 STRONG BUY</span> — Historically the best buying opportunity. Be greedy when others are fearful.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-success mb-3"><i class="fa-solid fa-arrow-up mr-1"></i>Top Gainers</h3>
+      <div class="space-y-2 text-xs">
+        ${[['ADA','$0.1709','+0.00%'],['DOGE','$0.0863','+0.00%'],['XRP','$1.15','+0.00%'],['AVAX','$6.66','+0.00%'],['DOT','$0.9505','+0.00%']].map(([t,p,c])=>`<div class="flex justify-between"><span class="font-mono font-bold">${t}</span><span class="font-mono">${p}</span><span class="text-success font-bold">${c}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-danger mb-3"><i class="fa-solid fa-arrow-down mr-1"></i>Top Losers</h3>
+      <div class="space-y-2 text-xs">
+        ${[['MATIC','$0.0745','-3.4%'],['APE','$1.40','-3.1%'],['CHZ','$0.0845','-2.8%'],['ALGO','$0.0886','-2.2%'],['MANA','$0.0680','-1.9%']].map(([t,p,c])=>`<div class="flex justify-between"><span class="font-mono font-bold">${t}</span><span class="font-mono">${p}</span><span class="text-danger font-bold">${c}</span></div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    ${[{n:'BTC Dominance',v:'62.4%',c:'accent'},{n:'BTC Price',v:'$63,388',c:'success'},{n:'ETH Price',v:'$1,673',c:'success'},{n:'Tracked Pairs',v:'39 pairs',c:'gold'}].map(s=>`<div class="card text-center"><div class="text-[9px] text-gray-500 uppercase font-bold">${s.n}</div><div class="text-xl font-black mt-2 text-${s.c} font-mono">${s.v}</div></div>`).join('')}
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">₿ All Crypto Prices · 39 Pairs</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 text-xs">
+      ${[
+        ['BTC','$63,388','+2.40%','success'],['ETH','$1,673','+2.10%','success'],['BNB','$602','+1.40%','success'],
+        ['SOL','$66.86','+5.20%','success'],['XRP','$1.14','+0.80%','success'],['ADA','$0.171','+1.20%','success'],
+        ['DOGE','$0.0863','+3.50%','success'],['AVAX','$6.66','+4.10%','success'],['LINK','$7.90','+2.20%','success'],
+        ['DOT','$0.9505','+1.80%','success'],['MATIC','$0.0745','-3.40%','danger'],['LTC','$42.52','+0.80%','success'],
+        ['BCH','$462','+1.20%','success'],['UNI','$2.52','+1.40%','success'],['ATOM','$1.99','+0.60%','success'],
+        ['NEAR','$2.10','+2.80%','success'],['ICP','$2.27','+1.10%','success'],['APT','$2.10','+3.20%','success'],
+        ['ARB','$1.20','+2.40%','success'],['OP','$2.40','+1.80%','success'],['IMX','$2.10','+1.50%','success'],
+        ['FIL','$0.7605','+0.90%','success'],['LDO','$2.89','+1.20%','success'],['INJ','$29.33','+3.40%','success'],
+        ['TIA','$9.27','+2.80%','success'],['WIF','$2.76','+5.80%','success'],['JUP','$0.8223','+4.20%','success'],
+        ['SEI','$0.6214','+2.40%','success'],['SUI','$1.80','+3.80%','success'],['PEPE','$0.0000028','+7.40%','success'],
+        ['SHIB','$0.0000175','+2.10%','success'],['APE','$1.40','-3.10%','danger'],['AXS','$8.14','+1.40%','success'],
+        ['SAND','$0.3800','+1.20%','success'],['MANA','$0.0680','-1.90%','danger'],['CHZ','$0.0845','-2.80%','danger'],
+        ['ALGO','$0.0886','-2.20%','danger'],['HBAR','$0.0798','+0.60%','success'],['STX','$1.13','+2.40%','success'],
+      ].map(([t,p,c,col])=>`<div class="p-2 rounded bg-panel-2 border border-gray-800 hover:border-accent cursor-pointer" onclick="globalTicker='${t}';switchTab('crypto-onchain')"><div class="font-mono font-bold">${t}</div><div class="text-gray-400 font-mono">${p}</div><div class="text-${col} font-bold text-[10px]">${c}</div></div>`).join('')}
+    </div>
+  </div>
+</div>
+`,
+
+'crypto-onchain': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-link text-accent"></i>On-Chain Metrics · ${globalTicker}</h1>
+      <p class="text-xs text-gray-500 mt-1">Network health · Fear &amp; Greed · Dominance · Hash rate</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <input id="onchainSearch" placeholder="Coin (BTC, ETH, SOL...)" class="input w-40" onkeydown="if(event.key==='Enter'){globalTicker=this.value.toUpperCase();renderActiveTab()}">
+      <button onclick="const s=document.getElementById('onchainSearch');globalTicker=s.value.toUpperCase()||'BTC';renderActiveTab()" class="btn btn-primary">Load</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Fear &amp; Greed</h3>
+      <canvas id="onchainFG" height="160"></canvas>
+      <div class="mt-2 p-2 rounded bg-success/10 text-xs text-success font-bold text-center">🟢 STRONG BUY · 12/100</div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Dominance</h3>
+      <canvas id="domGauge" height="160"></canvas>
+      <div class="mt-2 text-center text-2xl font-black text-accent font-mono">62.4%</div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Network Health</h3>
+      <div class="space-y-3 text-xs">
+        <div><div class="text-[9px] text-gray-500 font-bold uppercase">Hash Rate</div><div class="text-lg font-black font-mono text-success">620 EH/s</div></div>
+        <div><div class="text-[9px] text-gray-500 font-bold uppercase">Difficulty</div><div class="text-lg font-black font-mono">84.2T</div></div>
+        <div><div class="text-[9px] text-gray-500 font-bold uppercase">Active Addr.</div><div class="text-lg font-black font-mono">942.5K</div></div>
+        <div><div class="text-[9px] text-gray-500 font-bold uppercase">Mempool</div><div class="text-lg font-black font-mono text-gold">142.5K</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">📊 Fear &amp; Greed Scale</h3>
+    <div class="grid grid-cols-5 gap-2 text-[10px]">
+      ${[['Extreme Fear','<25','bg-emerald-500/15 text-success','🟢 Strong Buy'],['Fear','25-45','bg-emerald-500/10 text-success','🟡 Cautious Buy'],['Neutral','45-55','bg-gray-800 text-gray-300','⚖️ Neutral'],['Greed','55-75','bg-red-500/10 text-danger','🟡 Caution'],['Extreme Greed','>75','bg-red-500/15 text-danger','🔴 Sell Signal']].map(([n,r,c,act])=>`<div class="p-3 rounded-lg ${c} border border-gray-800"><div class="font-black uppercase">${n}</div><div class="text-gray-400 font-mono">${r}</div><div class="mt-1 font-bold">${act}</div></div>`).join('')}
+    </div>
+  </div>
+</div>
+`,
+
+altseason: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-shuffle text-accent"></i>Altcoin Season Index</h1>
+      <p class="text-xs text-gray-500 mt-1">Track if capital is in BTC or rotating to alts · 0=BTC, 100=Alt Season</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card">
+      <div class="text-[10px] text-gray-500 uppercase font-bold">CURRENT STATUS</div>
+      <div class="text-3xl font-black text-gold mt-2">↔️ NEUTRAL</div>
+      <div class="text-xs text-gray-400 mt-1">59% of alts beat BTC (90d)</div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Season Gauge</h3>
+      <canvas id="altGauge" height="140"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">📈 BTC vs Top Alts · Today</h3>
+    <canvas id="altChart" height="200"></canvas>
+  </div>
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">📖 How To Trade The Alt Season Index</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+      <div class="p-3 rounded bg-success/10 border border-success/20"><div class="font-black text-success mb-1">Index 75-100 (Alt Season)</div><p>Aggressive altcoin exposure. Small/mid caps can 5-10x. But exits fast — watch for sudden BTC dominance spike.</p></div>
+      <div class="p-3 rounded bg-emerald-500/5 border border-emerald-500/10"><div class="font-black text-success mb-1">Index 60-75 (Alts Leading)</div><p>Rotate some BTC profits into ETH, SOL, top alts. Keep 40%+ BTC for safety.</p></div>
+      <div class="p-3 rounded bg-gold/10 border border-gold/20"><div class="font-black text-gold mb-1">Index 40-60 (Neutral)</div><p>Balanced portfolio. No strong signal. Follow technicals.</p></div>
+      <div class="p-3 rounded bg-danger/10 border border-danger/20"><div class="font-black text-danger mb-1">Index 0-40 (BTC Season)</div><p>Hold BTC. Altcoins bleed vs BTC. Wait for index to turn.</p></div>
+    </div>
+  </div>
+</div>
+`,
+
+'whale-tracker': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-whale text-accent"></i>Whale Alert Tracker</h1>
+      <p class="text-xs text-gray-500 mt-1">Large wallet movements $1M+ · Deposits = sell pressure · Withdrawals = accumulation</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="card text-center"><div class="text-[9px] text-gray-500 uppercase font-bold">Total Tracked</div><div class="text-xl font-black mt-2 font-mono">$3.3M</div></div>
+    <div class="card text-center"><div class="text-[9px] text-gray-500 uppercase font-bold">Deposits</div><div class="text-xl font-black text-danger mt-2 font-mono">0</div></div>
+    <div class="card text-center"><div class="text-[9px] text-gray-500 uppercase font-bold">Withdrawals</div><div class="text-xl font-black text-success mt-2 font-mono">0</div></div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">🐳 Whale Transactions · Auto-refresh 30s</h3>
+    <div class="space-y-2">
+      <div class="flex items-center justify-between p-3 rounded-lg bg-panel-2 border border-gray-800">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded bg-accent/20 flex items-center justify-center text-accent font-bold text-xs">BTC</div>
+          <div>
+            <div class="text-sm font-bold">51.9035 BTC ($3.3M)</div>
+            <div class="text-[10px] text-gray-500 font-mono">Unknown Wallet → 324H9uyT...</div>
+          </div>
+        </div>
+        <span class="tag bg-gray-800 text-gray-400">TRANSFER</span>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+// ============== EDUCATION ==============
+playbook: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-chess text-accent"></i>Strategy Playbook</h1>
+      <p class="text-xs text-gray-500 mt-1">40 institutional strategies · 28 essential tips · Full execution guides</p>
+    </div>
+  </div>
+  <div class="flex border-b border-gray-800 gap-0.5">
+    <button onclick="setPlaybookSub('strategies')" class="px-4 py-2 text-xs font-black ${activePlaybookSub==='strategies'?'text-accent border-b-2 border-accent bg-accent/5':'text-gray-400 hover:text-white'}"><i class="fa-solid fa-list mr-1"></i>Strategies (40)</button>
+    <button onclick="setPlaybookSub('tips')" class="px-4 py-2 text-xs font-black ${activePlaybookSub==='tips'?'text-accent border-b-2 border-accent bg-accent/5':'text-gray-400 hover:text-white'}"><i class="fa-solid fa-lightbulb text-gold mr-1"></i>Essential Tips (28)</button>
+  </div>
+  ${activePlaybookSub==='strategies' ? `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${[
+        ['DCR','Double Candle Reversal','Scalping','Hard 78%'],['Headshot','Bull flag tight entry','Continuation','Medium 65%'],
+        ['Piercer','VWAP reclaim','Trend','Pro 82%'],['Enigma Moonshot','Multi-TF alignment','Continuation','Hard 76%'],
+        ['Titanic Zone','Major support zone','Reversal','Hard 88%'],['PRZ Cross','Pivot confluence','Reversal','Medium 71%'],
+        ['Diamond Dott','Volume spike reversal','Reversal','Hard 79%'],['J-Hook','Pullback continuation','Trend','Medium 68%'],
+        ['Richie','Range breakout','Continuation','Pro 81%'],['Turtle','Slow steady trend','Trend','Beginner 74%'],
+      ].map(([n,d,cat,diff])=>`<div class="card cursor-pointer hover:border-accent transition"><div class="flex items-center justify-between mb-2"><span class="text-lg font-black text-accent">${n}</span><span class="tag bg-gold/15 text-gold">${diff}</span></div><div class="text-[10px] text-gray-500 uppercase font-bold">${cat}</div><div class="text-xs text-gray-300 mt-2">${d}</div><div class="text-[10px] text-accent mt-2">▶ Click to view full execution</div></div>`).join('')}
+    </div>
+  ` : `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      ${[
+        ['4 Types of Stop Losses','Hard, Trailing, Time, Mental — when to use each','Risk Mgmt'],
+        ['2-Try Rule','Max 2 attempts per setup. Move on if stopped twice','Discipline'],
+        ['Practice 10x Size','Paper trade at 10x to acclimate psychologically','Psychology'],
+        ['Daily Loss Limit','Auto-lock at 3% loss. Protects capital','Risk Mgmt'],
+        ['Windfall Rules','Hit 3x daily target? Stop trading.','Risk Mgmt'],
+        ['Hotkeys','Space=Buy, Esc=Cancel. Sub-second execution.','Technical'],
+      ].map(([n,d,cat])=>`<div class="card cursor-pointer hover:border-accent transition"><div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-lightbulb text-gold"></i><span class="font-black text-sm">${n}</span></div><div class="text-[10px] text-gray-500 uppercase font-bold mb-1">${cat}</div><div class="text-xs text-gray-300">${d}</div></div>`).join('')}
+    </div>
+  `}
+</div>
+`,
+
+psychology: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-brain text-accent"></i>Psychology &amp; Bias Assessment</h1>
+      <p class="text-xs text-gray-500 mt-1">Identify cognitive biases, FOMO tendencies &amp; trading style profile</p>
+    </div>
+  </div>
+  <div class="flex border-b border-gray-800 gap-0.5">
+    <button onclick="setPsychologySub('style')" class="px-4 py-2 text-xs font-black ${activePsychologySub==='style'?'text-accent border-b-2 border-accent bg-accent/5':'text-gray-400 hover:text-white'}">Style Profiler</button>
+    <button onclick="setPsychologySub('bias')" class="px-4 py-2 text-xs font-black ${activePsychologySub==='bias'?'text-accent border-b-2 border-accent bg-accent/5':'text-gray-400 hover:text-white'}">Bias Quiz</button>
+    <button onclick="setPsychologySub('habits')" class="px-4 py-2 text-xs font-black ${activePsychologySub==='habits'?'text-accent border-b-2 border-accent bg-accent/5':'text-gray-400 hover:text-white'}">Daily Habits</button>
+  </div>
+  ${activePsychologySub==='style' ? `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="card">
+        <h3 class="text-xs font-black uppercase text-accent mb-3">Identify Your Style</h3>
+        <div class="space-y-3">
+          <div><div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Holding Period</div><div class="flex gap-2">${['Seconds','Minutes','Hours','Days'].map((t,i)=>`<button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.className=b.className.replace('bg-accent text-white','bg-dark text-gray-400'));this.className='px-3 py-1.5 rounded text-[10px] font-bold bg-accent text-white'">${t}</button>`).join('')}</div></div>
+          <div><div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Analytical Focus</div><div class="flex gap-2">${['Order Book','Indicators','Fundamentals'].map((t,i)=>`<button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.className=b.className.replace('bg-accent text-white','bg-dark text-gray-400'));this.className='px-3 py-1.5 rounded text-[10px] font-bold bg-accent text-white'">${t}</button>`).join('')}</div></div>
+          <div><div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Risk Comfort</div><div class="flex gap-2">${['Rapid','No Overnight','Long Conviction'].map((t,i)=>`<button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.className=b.className.replace('bg-accent text-white','bg-dark text-gray-400'));this.className='px-3 py-1.5 rounded text-[10px] font-bold bg-accent text-white'">${t}</button>`).join('')}</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-xs font-black uppercase text-accent mb-3">Computed Profile</h3>
+        <div class="p-4 rounded-lg bg-accent/10 border border-accent/20 text-center">
+          <div class="text-2xl font-black text-accent">⚡ Pro Scalper</div>
+          <div class="text-xs text-gray-400 mt-1 italic">"In and out in seconds. Tick by tick precision."</div>
+        </div>
+        <div class="mt-3 space-y-1 text-xs">
+          <div class="flex justify-between"><span class="text-gray-400">Timeframe:</span><span class="font-bold">Seconds to Minutes</span></div>
+          <div class="flex justify-between"><span class="text-gray-400">Key Indicators:</span><span class="font-bold">Level 2, Order Flow</span></div>
+          <div class="flex justify-between"><span class="text-gray-400">Best Strategies:</span><span class="font-bold">DCR, Headshot, Piercer</span></div>
+        </div>
+      </div>
+    </div>
+  ` : activePsychologySub==='bias' ? `
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Cognitive Bias Quiz</h3>
+      <div class="space-y-4 text-xs">
+        ${[['1. Long trade hits stop. What do you do?',['Move stop lower hoping for rebound (Loss Aversion)','Accept the loss and look for next setup (Correct)']],['2. Stock rallies 15% in 5 min. Reaction?',['Buy immediately to catch the run (FOMO)','Wait for retest before entry (Disciplined)']],['3. Last 3 trades were losers. Next?',['Double position to recover (Revenge)','Reduce size, follow checklist (Correct)']]].map(([q,opts],i)=>`<div class="p-3 rounded bg-panel-2"><p class="font-bold mb-2">${q}</p><div class="space-y-2">${opts.map(o=>`<label class="flex items-center gap-2 p-2 rounded hover:bg-dark cursor-pointer"><input type="radio" name="q${i}" class="accent-accent"><span>${o}</span></label>`).join('')}</div></div>`).join('')}
+一起</div>
+  ` : `
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">Daily Trading Habits</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+        ${['Review yesterday\'s trades','Set daily max loss limit','Check economic calendar','Identify 3 setups for today','Practice box visualization','Warm up with paper trades','Confirm stop-loss levels','Take regular breaks','Review risk per trade','End with journal entry'].map(h=>`<label class="flex items-center gap-2 p-2 rounded bg-panel-2 hover:bg-dark cursor-pointer"><input type="checkbox" class="accent-accent"><span>${h}</span></label>`).join('')}
+      </div>
+    </div>
+  `}
+</div>
+`,
+
+// ============== CONGRESS ==============
+congress: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-user-secret text-accent"></i>Congress &amp; Insider Trades</h1>
+      <p class="text-xs text-gray-500 mt-1">Public SEC Form 4 + STOCK Act disclosures · Real-time tracking</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">🏛️ Congressional Trades</h3>
+    <div class="space-y-2">
+      ${CONGRESS_TRADES.map(t=>`
+        <div class="grid grid-cols-12 gap-3 items-center p-3 rounded-lg bg-panel-2 hover:bg-dark transition cursor-pointer" onclick="globalTicker='${t.ticker}';switchTab('symbol-detail')">
+          <div class="col-span-3">
+            <div class="font-bold text-white">${t.politician}</div>
+            <div class="text-[10px] text-gray-500">${t.party} · ${t.date}</div>
+          </div>
+          <div class="col-span-2 font-mono font-bold">${t.ticker}</div>
+          <div class="col-span-2"><span class="tag ${t.type==='BUY'?'bg-success/20 text-success':'bg-danger/20 text-danger'}">${t.type}</span></div>
+          <div class="col-span-3 text-xs text-gray-300">${t.amount}</div>
+          <div class="col-span-2 text-right font-mono text-xs">
+            <div class="text-white">${t.price}</div>
+            <div class="text-success">${t.chg}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">💼 Insider Trades (SEC Form 4)</h3>
+    <div class="space-y-2">
+      ${INSIDER_TRADES.map(t=>`
+        <div class="grid grid-cols-12 gap-3 items-center p-3 rounded-lg bg-panel-2 hover:bg-dark transition cursor-pointer" onclick="globalTicker='${t.ticker}';switchTab('symbol-detail')">
+          <div class="col-span-3">
+            <div class="font-bold text-white">${t.name}</div>
+            <div class="text-[10px] text-gray-500">${t.role} · ${t.date}</div>
+          </div>
+          <div class="col-span-2 font-mono font-bold">${t.ticker}</div>
+          <div class="col-span-2"><span class="tag ${t.type==='BUY'?'bg-success/20 text-success':'bg-danger/20 text-danger'}">${t.type}</span></div>
+          <div class="col-span-3 text-xs text-gray-300">${t.amount}</div>
+          <div class="col-span-2 text-right font-mono text-xs text-white">${t.price}</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+</div>
+`,
+
+alerts: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-bell text-accent"></i>Alerts &amp; Push Notifications</h1>
+      <p class="text-xs text-gray-500 mt-1">Configure alerts for price, signals, news &amp; P&amp;L targets</p>
+    </div>
+    <button class="btn btn-primary"><i class="fa-solid fa-bell mr-1"></i>Enable Browser Notifications</button>
+  </div>
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3">Notification Triggers</h3>
+    <div class="space-y-3">
+      ${[
+        ['🤖 AutoTrader Signal','When high-confidence bot fires','automatic','$0','Daily'],
+        ['💰 Price Alert Hit','Price targets hit','automatic','$200','Daily'],
+        ['📈 Daily P&amp;L Target','Daily profit goal reached','automatic','$200','Daily'],
+        ['🛑 Daily Loss Limit','Approaching loss limit','automatic','$100','Daily'],
+        ['🌅 Market Open','NYSE 9:30 AM','automatic','$0','Daily'],
+        ['📰 High-Impact News','Watchlist news','automatic','$0','Daily'],
+      ].map(([n,d,m,a,f])=>`<div class="grid grid-cols-12 gap-3 items-center p-3 rounded bg-panel-2"><div class="col-span-3 font-bold text-xs">${n}</div><div class="col-span-3 text-xs text-gray-400">${d}</div><div class="col-span-2"><select class="input"><option>${m}</option><option>Manual</option><option>Off</option></select></div><div class="col-span-2"><input type="number" class="input" value="${a.replace('$','')}"></div><div class="col-span-2"><select class="input"><option>${f}</option><option>Weekly</option><option>Monthly</option></select></div></div>`).join('')}
+    </div>
+  </div>
+</div>
+`,
+
+// ============== PORTFOLIO ==============
+'pl-tracker': () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-receipt text-accent"></i>P&amp;L Tracker &amp; Reports</h1>
+      <p class="text-xs text-gray-500 mt-1">Trade log · bot performance · session stats · risk metrics</p>
+    </div>
+    <button class="btn btn-primary"><i class="fa-solid fa-file-pdf mr-1"></i>Generate PDF Report</button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+    ${[['Total P&L','+$1,684','success'],['Win Rate','61.3%','white'],['Avg Win','+$347','success'],['Avg Loss','-$182','danger'],['Profit Factor','1.89','accent'],['Sharpe','4.45','gold']].map(([n,v,c])=>`<div class="card text-center"><div class="text-[9px] text-gray-500 uppercase font-bold">${n}</div><div class="text-xl font-black mt-2 font-mono text-${c}">${v}</div></div>`).join('')}
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">⏰ Best Time of Day</h3>
+      <div class="space-y-2 text-xs">
+        ${[['9:30-10:00','3 trades','100%','+$874'],['10:00-11:00','2 trades','0%','-$124'],['11:00-14:00','2 trades','50%','+$65'],['14:00-16:00','1 trade','100%','+$9']].map(([t,tr,wr,pl])=>`<div class="flex justify-between p-2 rounded bg-panel-2"><div><div class="font-bold">${t}</div><div class="text-[10px] text-gray-500">${tr} · ${wr} WR</div></div><div class="${pl.startsWith('+')?'text-success':'text-danger'} font-bold">${pl}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">🎯 P&amp;L by Setup</h3>
+      <div class="space-y-2 text-xs">
+        ${[['Short Squeeze','2W/0L','100%','+$1,132'],['Trend','1W/1L','50%','+$265'],['Momentum','1W/0L','100%','+$52'],['VWAP Bounce','1W/0L','100%','+$9'],['ORB','0W/2L','0%','-$124']].map(([s,t,wr,pl])=>`<div class="flex justify-between p-2 rounded bg-panel-2"><div><div class="font-bold">${s}</div><div class="text-[10px] text-gray-500">${t} · ${wr}</div></div><div class="${pl.startsWith('+')?'text-success':'text-danger'} font-bold">${pl}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-black uppercase text-accent mb-3">📈 Trade Stats</h3>
+      <div class="space-y-2 text-xs font-mono">
+        ${[['Best Trade','+$1,318'],['Worst Trade','-$182'],['Max Win Streak','5 trades'],['Total Trades','8'],['Avg Trade','+$211']].map(([n,v])=>`<div class="flex justify-between border-b border-gray-800 pb-1.5"><span class="text-gray-400">${n}</span><span class="font-bold">${v}</span></div>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+// ============== SETTINGS ==============
+settings: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-gear text-accent"></i>Settings &amp; API Vault</h1>
+      <p class="text-xs text-gray-500 mt-1">API keys · Trading rules · Notifications · Display · Backup</p>
+    </div>
+    <button class="btn btn-primary"><i class="fa-solid fa-floppy-disk mr-1"></i>Save All</button>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-2">
+    ${['Data Sources','Trading Rules','Notifications','Display','Backup','Help'].map(s=>`<button class="card text-center hover:border-accent cursor-pointer"><div class="text-xs font-bold">${s}</div></button>`).join('')}
+  </div>
+
+  <div class="card">
+    <h3 class="text-xs font-black uppercase text-accent mb-3"><i class="fa-solid fa-key mr-1"></i>API Vault · Encrypted Locally (AES-256)</h3>
+    <div class="space-y-2">
+      ${[
+        ['Finnhub','Free key (60/min)','https://finnhub.io','Broker/Stock data'],
+        ['Alpha Vantage','Free tier (25/day)','https://alphavantage.co','Stock fundamentals'],
+        ['Polygon.io','$199/mo real-time','https://polygon.io','L2 &amp; real-time data'],
+        ['Alpaca','Free paper trading','https://alpaca.markets','Stock execution'],
+        ['Tastytrade','Options trading','https://tastytrade.com','Options execution'],
+        ['Coinbase Advanced','Crypto trading','https://coinbase.com','Crypto execution'],
+        ['Binance','Crypto trading','https://binance.com','Crypto execution'],
+        ['Webull','Stock trading','https://webull.com','Stock execution'],
+        ['Yahoo Finance','🆓 No API key required','Built-in','Stock quotes (free)'],
+        ['CoinGecko','🆓 No API key required','Built-in','Crypto quotes (free)'],
+      ].map(([n,t,u,d])=>`<div class="grid grid-cols-12 gap-3 items-center p-3 rounded bg-panel-2"><div class="col-span-2 font-bold text-xs">${n}</div><div class="col-span-2 text-[10px] text-gray-400">${t}</div><div class="col-span-3 text-[10px] text-accent font-mono truncate">${u}</div><div class="col-span-2 text-[10px] text-gray-500">${d}</div><div class="col-span-3 text-right"><input class="input text-xs" placeholder="${u.includes('key')?'Paste API key...':'Auto-connected'}" ${u.includes('No API')?'disabled':''}></div></div>`).join('')}
+    </div>
+  </div>
+</div>
+`,
+
+help: () => `
+<div class="p-5 space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black flex items-center gap-3"><i class="fa-solid fa-circle-question text-accent"></i>Help Center &amp; Walkthroughs</h1>
+      <p class="text-xs text-gray-500 mt-1">Step-by-step guides for every feature in the app</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="lg:col-span-1 space-y-3">
+      <div class="card">
+        <h3 class="text-xs font-black uppercase text-accent mb-3">Walkthrough Categories</h3>
+        <div class="space-y-1">
+          ${[
+            ['📊 Market Data','View live prices, indices, and global markets across all asset classes'],
+            ['🔍 Analysis Tools','Backtest strategies, view correlations, market regime, and signal performance'],
+            ['💼 Trading Tools','Execute paper trades, manage positions, set smart stops, and chart analysis'],
+            ['📖 Strategy &amp; Education','Learn 40+ strategies, 38 chart patterns, and psychological assessments'],
+            ['💰 Portfolio &amp; Risk','Track P&L, generate reports, monitor risk, and manage positions'],
+            ['🧠 AI &amp; Bots','Configure Oracle Bots, AutoTrader, AI Chart Engine, and AI Vision'],
+            ['🔔 Alerts &amp; Monitoring','Configure price alerts, push notifications, and broker alerts'],
+            ['⚙️ Data &amp; Platform','Connect API keys, manage backups, and configure display settings'],
+          ].map(([n,d])=>`<div class="p-3 rounded-lg hover:bg-dark cursor-pointer border border-transparent hover:border-accent transition" onclick="this.parentElement.querySelectorAll('div').forEach(d=>d.classList.remove('bg-accent/10','border-accent'));this.classList.add('bg-accent/10','border-accent')"><div class="font-bold text-xs">${n}</div><div class="text-[10px] text-gray-400 mt-1">${d}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2">
+      <div class="card">
+        <h3 class="text-xs font-black uppercase text-accent mb-3">📊 Market Data Walkthroughs</h3>
+        <div class="space-y-3">
+          ${[
+            ['Pro Charts','Industry-grade charting with 27 indicators across 6 categories. Click any indicator in the left panel to add it to the chart. Use the timeframe selector (1m to 1W) for different views.'],
+            ['Global Markets','Track every major market worldwide — US indices, international markets, futures, crypto, and commodities. All live and clickable.'],
+            ['Symbol Detail','Deep dive into any ticker. Switch between Overview, Technical Analysis, Fundamentals, Company Profile, and News sub-tabs.'],
+            ['Scanner','Custom-filter across 15,000+ stocks. Save scan presets, run pre-market gap scans, or build custom conditions.'],
+          ].map(([n,d])=>`<div class="p-3 rounded-lg bg-panel-2"><div class="font-black text-sm">${n}</div><p class="text-xs text-gray-300 mt-1">${d}</p></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <h3 class="text-xs font-black uppercase text-accent mb-3">⌨️ Keyboard Shortcuts</h3>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          ${[['/','Search symbols'],['Q','Quick Trade'],['?','Help'],['1-9','Switch tabs'],['Esc','Close modal'],['B','Buy (paper)'],['S','Sell (paper)'],['Space','Toggle play'].map(([k,d])=>`<div class="flex justify-between p-2 rounded bg-panel-2"><span class="kbd">${k}</span><span class="text-gray-400">${d}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`,
+
+};
+
+// ============================================================
+//  CHART 38-PATTERNS
+// ============================================================
+function renderPatterns38() {
+  // Render SVG for each pattern
+  function getPatternSVG(p, w=180, h=80) {
+    const col = p.grad;
+    const isBull = p.type.includes('Bullish');
+    const isBear = p.type.includes('Bearish');
+    const pts = [];
+    // Generate pattern-specific shapes
+    if (p.id==='p1') { // Ascending triangle
+      pts.push(`<line x1="10" y1="20" x2="${w-10}" y2="20" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<polyline points="20,55 60,40 100,55 140,40 170,18" fill="none" stroke="${col}" stroke-width="2"/>`);
+    } else if (p.id==='p2') { // Descending triangle
+      pts.push(`<line x1="10" y1="60" x2="${w-10}" y2="60" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<polyline points="20,18 60,30 100,18 140,30 170,62" fill="none" stroke="${col}" stroke-width="2"/>`);
+    } else if (p.id==='p3') { // Symmetrical triangle
+      pts.push(`<polyline points="20,18 80,40 140,40" fill="none" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<polyline points="20,62 80,40 140,40" fill="none" stroke="${col}" stroke-width="2"/>`);
+    } else if (p.id==='p4') { // Bull flag
+      pts.push(`<polyline points="10,65 30,40 50,18 65,18" fill="none" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<polyline points="65,18 80,28 100,22 115,30" fill="none" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<polyline points="115,30 130,22 145,28" fill="none" stroke="${col}" stroke-width="2"/>`);
+    } else if (p.id==='p5') { // Bear flag
+      pts.push(`<polyline points="10,18 30,40 50,62 65,62" fill="none" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<polyline points="65,62 80,52 100,58 115,50" fill="none" stroke="${col}" stroke-width="2"/>`);
+    } else if (p.id==='p6' || p.id==='p7') { // Wedges
+      pts.push(`<polyline points="20,${p.id==='p6'?60:18} 80,40 140,${p.id==='p6'?20:55}" fill="none" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<polyline points="40,${p.id==='p6'?65:22} 80,40 140,${p.id==='p6'?28:48}" fill="none" stroke="${col}" stroke-width="2"/>`);
+    } else if (p.id==='p8') { // Cup & handle
+      pts.push(`<path d="M20,20 Q60,65 80,60 Q90,55 100,60 Q130,65 160,20" fill="none" stroke="${col}" stroke-width="2"/>`);
+    } else if (p.id==='p10' || p.id==='p11') { // Double bottom/top
+      const ys = p.id==='p10'?[55,25,55]:[25,55,25];
+      pts.push(`<polyline points="10,${ys[0]} 50,${ys[0]} 80,${ys[1]} 110,${ys[0]} 170,${ys[0]}" fill="none" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<line x1="10" y1="${ys[1]+15}" x2="170" y2="${ys[1]+15}" stroke="#666" stroke-dasharray="3,2"/>`);
+    } else if (p.id==='p14' || p.id==='p15') { // H&amp;S
+      pts.push(`<polyline points="10,30 30,55 50,30 80,15 110,30 140,55 170,30" fill="none" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<line x1="10" y1="55" x2="170" y2="55" stroke="#666" stroke-dasharray="3,2"/>`);
+    } else if (p.id==='p19' || p.id==='p20') { // Diamond
+      pts.push(`<polygon points="80,10 130,40 80,70 30,40" fill="none" stroke="${col}" stroke-width="2"/>`);
+    } else if (p.id==='p37' || p.id==='p38') { // Gaps
+      pts.push(`<polyline points="20,30 40,30 60,20 80,20" fill="none" stroke="${col}" stroke-width="2"/>`);
+      pts.push(`<line x1="60" y1="10" x2="80" y2="10" stroke="${col}" stroke-width="2" stroke-dasharray="3,2"/>`);
+      if (p.id==='p38') {
+        pts.push(`<polyline points="80,20 100,40 130,50" fill="none" stroke="${col}" stroke-width="2"/>`);
+      } else {
+        pts.push(`<polyline points="80,20 120,10 140,5" fill="none" stroke="${col}" stroke-width="2"/>`);
+      }
+    } else {
+      // Generic
+      pts.push(`<polyline points="10,40 40,30 70,45 100,20 130,35 170,15" fill="none" stroke="${col}" stroke-width="2"/>`);
+    }
+    return pts.join('');
+  }
+
+  return `
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 class="text-sm font-black">All 38 Chart Patterns · Like the LiteFinance reference</h3>
+          <p class="text-[10px] text-gray-500">Reversal · Continuation · Neutral · with reliability ratings &amp; execution guides</p>
+        </div>
+        <div class="flex gap-2">
+          <input id="patSearch" placeholder="Search patterns..." class="input w-40" oninput="filterPatterns(this.value)">
+          <select id="patCatFilter" class="input w-32" onchange="filterPatterns(document.getElementById('patSearch').value)">
+            <option value="all">All Categories</option>
+            <option value="Continuation">Continuation</option>
+            <option value="Reversal">Reversal</option>
+            <option value="Harmonic">Harmonic</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="patternsGrid">
+      ${PATTERNS_38.map(p=>`
+        <div class="pattern-card" data-name="${p.name.toLowerCase()}" data-cat="${p.cat}">
+          <div class="pattern-svg-box">
+            <svg viewBox="0 0 180 80" class="w-full" style="max-height:90px">
+              ${getPatternSVG(p)}
+            </svg>
+          </div>
+          <div class="p-3 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-black text-sm">${p.name}</h4>
+              <span class="tag" style="background:${p.grad}20;color:${p.grad}">${p.type}</span>
+            </div>
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="text-gray-500 uppercase font-bold">${p.cat}</span>
+              <span class="text-gold">${'★'.repeat(p.reliability)}${'☆'.repeat(5-p.reliability)}</span>
+            </div>
+            <p class="text-[10px] text-gray-300 leading-relaxed">${p.desc}</p>
+            <div class="p-2 rounded bg-panel-2 border-l-2" style="border-color:${p.grad}">
+              <div class="text-[9px] font-black uppercase" style="color:${p.grad}">📖 ${p.signal}</div>
+              <p class="text-[10px] text-gray-400 mt-1">${p.how}</p>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card mt-4">
+      <h3 class="text-xs font-black uppercase text-accent mb-2"><i class="fa-solid fa-graduation-cap mr-1"></i>Pattern Reliability Guide</h3>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+        ${[['★★★★★','Premium · 5 confluence required'],['★★★★','High · Trend + volume confirmation'],['★★★','Solid · Standard pattern'],['★★','Speculative · Needs heavy confirmation'],['★','Low · Trade small only']].map(([s,d])=>`<div class="p-2 rounded bg-panel-2"><div class="text-gold text-sm">${s}</div><div class="text-gray-400 text-[10px]">${d}</div></div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function filterPatterns(q) {
+  const cat = document.getElementById('patCatFilter')?.value || 'all';
+  const grid = document.getElementById('patternsGrid');
+  if (!grid) return;
+  const term = q.toLowerCase();
+  grid.querySelectorAll('.pattern-card').forEach(c=>{
+    const name = c.dataset.name;
+    const cCat = c.dataset.cat;
+    const matchQ = !term || name.includes(term);
+    const matchC = cat==='all' || cCat===cat;
+    c.style.display = (matchQ && matchC) ? '' : 'none';
+  });
+}
+
+// ============================================================
+//  CHART 26 CANDLES (existing)
+// ============================================================
+function renderCandles26() {
+  const CANDLES_26 = [
+    {name:'Hammer',cat:'Bullish',type:'Single Reversal',star:'★★★★★',desc:'Short body with long lower wick. Buyers rejected sellers.',how:'Confirm with bullish candle next session. Enter on close above hammer high.',grad:'#10b981'},
+    {name:'Shooting Star',cat:'Bearish',type:'Single Reversal',star:'★★★★★',desc:'Small body with long upper wick. Sellers rejected buyers at highs.',how:'Confirm with bearish candle next session. Enter on close below star low.',grad:'#ef4444'},
+    {name:'Bullish Engulfing',cat:'Bullish',type:'Double Reversal',star:'★★★★★',desc:'Green candle completely engulfs prior red candle. Strong reversal.',how:'Enter on close of engulfing candle. Stop below engulfing low.',grad:'#10b981'},
+    {name:'Bearish Engulfing',cat:'Bearish',type:'Double Reversal',star:'★★★★★',desc:'Red candle engulfs prior green candle. Strong bearish reversal.',how:'Enter short on close. Stop above engulfing high.',grad:'#ef4444'},
+    {name:'Morning Star',cat:'Bullish',type:'Triple Reversal',star:'★★★★★',desc:'Three-candle reversal: red, small indecision, green. Classic bottom.',how:'Enter on close of third (green) candle. Stop below the star candle.',grad:'#10b981'},
+    {name:'Evening Star',cat:'Bearish',type:'Triple Reversal',star:'★★★★★',desc:'Three-candle reversal: green, small indecision, red. Classic top.',how:'Enter short on close of third (red) candle. Stop above the star.',grad:'#ef4444'},
+    {name:'Doji',cat:'Neutral',type:'Single Indecision',star:'★★★',desc:'Open and close nearly equal. Market indecision.',how:'Wait for next candle to confirm direction. Not a signal by itself.',grad:'#9ca3af'},
+    {name:'Spinning Top',cat:'Neutral',type:'Single Indecision',star:'★★',desc:'Small body with equal wicks both sides. Indecision.',how:'Confirm with context. Trend weakening.',grad:'#9ca3af'},
+    {name:'Bullish Harami',cat:'Bullish',type:'Double Reversal',star:'★★★',desc:'Small green inside prior red. Potential reversal.',how:'Confirm with third candle. Enter on close above harami high.',grad:'#10b981'},
+    {name:'Bearish Harami',cat:'Bearish',type:'Double Reversal',star:'★★★',desc:'Small red inside prior green. Potential reversal.',how:'Confirm with third candle. Enter short.',grad:'#ef4444'},
+    {name:'Three White Soldiers',cat:'Bullish',type:'Triple Continuation',star:'★★★★★',desc:'Three consecutive green candles with higher closes. Strong bullish.',how:'Enter on close of third. Trail stop below first candle low.',grad:'#10b981'},
+    {name:'Three Black Crows',cat:'Bearish',type:'Triple Continuation',star:'★★★★★',desc:'Three consecutive red candles with lower closes. Strong bearish.',how:'Enter short on close of third. Trail stop above first candle high.',grad:'#ef4444'},
+    {name:'Rising Three Methods',cat:'Bullish',type:'Five Continuation',star:'★★★★',desc:'Tall green + three small red inside range + tall green. Bullish continuation.',how:'Enter on close of final green. Stop below consolidation.',grad:'#10b981'},
+    {name:'Falling Three Methods',cat:'Bearish',type:'Five Continuation',star:'★★★★',desc:'Tall red + three small green inside range + tall red. Bearish continuation.',how:'Enter short on close of final red.',grad:'#ef4444'},
+  ];
+  return `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${CANDLES_26.map(p=>`
+        <div class="card">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-black text-sm">${p.name}</h4>
+            <span class="tag" style="background:${p.grad}20;color:${p.grad}">${p.cat}</span>
+          </div>
+          <div class="flex items-center justify-between text-[10px] mb-2">
+            <span class="text-gray-500 uppercase font-bold">${p.type}</span>
+            <span class="text-gold">${p.star}</span>
+          </div>
+          <div class="h-16 mb-2 bg-dark rounded flex items-center justify-center">
+            <svg viewBox="0 0 60 40" class="w-20 h-16">
+              ${p.cat==='Bullish' ? '<line x1="30" y1="5" x2="30" y2="38" stroke="#10b981" stroke-width="2"/><rect x="22" y="12" width="16" height="20" fill="#10b981" opacity="0.6" rx="2"/>' :
+                p.cat==='Bearish' ? '<line x1="30" y1="2" x2="30" y2="35" stroke="#ef4444" stroke-width="2"/><rect x="22" y="8" width="16" height="20" fill="#ef4444" opacity="0.6" rx="2"/>' :
+                '<line x1="30" y1="5" x2="30" y2="35" stroke="#9ca3af" stroke-width="2"/><rect x="20" y="18" width="20" height="4" fill="#9ca3af" rx="1"/>'}
+            </svg>
+          </div>
+          <p class="text-[10px] text-gray-300 leading-relaxed mb-2">${p.desc}</p>
+          <div class="p-2 rounded bg-panel-2 border-l-2" style="border-color:${p.grad}">
+            <p class="text-[10px] text-gray-400">${p.how}</p>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ============================================================
+//  SYMBOL DETAIL SUB-TABS
+// ============================================================
+function renderSymbolOverview() {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 card">
+        <canvas id="symChart" height="280"></canvas>
+      </div>
+      <div class="space-y-4">
+        <div class="card">
+          <h3 class="text-xs font-black uppercase text-accent mb-3">Key Stats</h3>
+          <div class="space-y-2 text-xs">
+            ${[['Float','15.7B'],['Short Interest','1.2%'],['ATR','4.82'],['Avg Volume','52.4M'],['52w High','$310.40'],['52w Low','$165.20'],['Beta','1.24'],['Mkt Cap','$4.55T']].map(([n,v])=>`<div class="flex justify-between"><span class="text-gray-400">${n}</span><span class="font-bold">${v}</span></div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSymbolTA() {
+  return `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      ${[
+        ['RSI (14)','62.4','Neutral-Bullish','accent'],
+        ['MACD','+1.85','Bullish cross','success'],
+        ['EMA 20','$293.40','Price above','success'],
+        ['EMA 50','$282.10','Strong trend up','success'],
+        ['EMA 200','$245.30','Long-term up','success'],
+        ['VWAP','$295.10','Price at','gold'],
+        ['Bollinger','Mid','Neutral','accent'],
+        ['ATR','4.82','Moderate vol','white'],
+      ].map(([n,v,s,c])=>`<div class="card"><div class="text-[9px] text-gray-500 uppercase font-bold">${n}</div><div class="text-2xl font-black mt-1 font-mono text-${c}">${v}</div><div class="text-[10px] text-gray-400 mt-1">${s}</div></div>`).join('')}
+    </div>
+  `;
+}
+
+function renderSymbolFundamentals() {
+  return `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      ${[
+        ['P/E (TTM)','31.06','Premium to sector','gold'],
+        ['P/S','7.79','High','gold'],
+        ['P/B','47.2','High','gold'],
+        ['PEG','2.84','Growth premium','accent'],
+        ['EPS (TTM)','$9.52','Strong','success'],
+        ['Revenue (TTM)','$385B','Healthy','success'],
+        ['Profit Margin','25.4%','Excellent','success'],
+        ['Dividend','0.46%','Low yield','white'],
+      ].map(([n,v,s,c])=>`<div class="card"><div class="text-[9px] text-gray-500 uppercase font-bold">${n}</div><div class="text-2xl font-black mt-1 font-mono text-${c}">${v}</div><div class="text-[10px] text-gray-400 mt-1">${s}</div></div>`).join('')}
+    </div>
+  `;
+}
+
+function renderSymbolProfile() {
+  return `
+    <div class="card max-w-3xl">
+      <h3 class="text-xs font-black uppercase text-accent mb-3"><i class="fa-solid fa-building mr-1"></i>Company Profile · ${globalTicker} <span class="tag bg-success/15 text-success ml-2"><span class="live-dot"></span> LIVE · Yahoo Finance</span></h3>
+      <div class="space-y-4">
+        <div>
+          <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Business Summary</div>
+          <p class="text-sm text-gray-300 leading-relaxed">${globalTicker} is a leading technology company that designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories. The Company also offers a range of related services including digital content, payment services, and cloud storage. Founded in 1976, the company operates globally with headquarters in Cupertino, California.</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-gray-800">
+          ${[['Sector','Technology'],['Industry','Consumer Electronics'],['Exchange','NASDAQ'],['Country','USA'],['Employees','161,000'],['HQ','Cupertino, CA'],['Founded','1976'],['Website','www.apple.com']].map(([k,v])=>`<div><div class="text-[9px] text-gray-500 uppercase font-bold">${k}</div><div class="text-sm font-bold mt-1">${v}</div></div>`).join('')}
+        </div>
+        <div class="pt-3 border-t border-gray-800">
+          <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Website</div>
+          <a href="https://www.apple.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent font-bold text-sm transition-all">
+            🔗 www.apple.com <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSymbolNews() {
+  return `
+    <div class="space-y-2">
+      ${NEWS_FEED.filter(n=>n.ticker===globalTicker).concat(NEWS_FEED.slice(0,4)).map(n=>`
+        <div class="card cursor-pointer hover:border-accent">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-[10px] text-gray-500 font-mono">${n.time}</span>
+            <span class="font-bold font-mono">${n.ticker}</span>
+            <span class="tag ${n.impact==='Bullish'?'bg-success/15 text-success':'bg-danger/15 text-danger'}">${n.impact}</span>
+            <span class="text-[10px] text-gray-500 ml-auto">${n.source}</span>
+          </div>
+          <div class="text-sm">${n.title}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ============================================================
+//  TAB SUB-HANDLERS
+// ============================================================
+function setCandleSub(s) { activeCandleSub=s; renderActiveTab(); }
+function setSymbolDetailSub(s) { activeSymbolDetailSub=s; renderActiveTab(); }
+function setPsychologySub(s) { activePsychologySub=s; renderActiveTab(); }
+function setPlaybookSub(s) { activePlaybookSub=s; renderActiveTab(); }
+function setProChartTF(tf) { proChartsTimeframe=tf; renderActiveTab(); }
+function setProChartType(t) { playBeep(600,80); }
+
+// Pro Charts indicator toggle
+function toggleIndicator(id, cat) {
+  if (proChartsIndicators.includes(id)) proChartsIndicators = proChartsIndicators.filter(x=>x!==id);
+  else proChartsIndicators.push(id);
+  renderActiveTab();
+  playBeep(800, 60);
+}
+
+function filterIndicators(q) {
+  const list = document.getElementById('indList');
+  if (!list) return;
+  const term = q.toLowerCase();
+  list.querySelectorAll('.indicator-cell').forEach(c=>{
+    c.style.display = (!term || c.dataset.name.includes(term)) ? '' : 'none';
+  });
+}
+
+function setIndCat(cat) {
+  const btns = document.querySelectorAll('#indCats button');
+  btns.forEach(b=>{
+    b.classList.remove('text-accent','border-b-2','border-accent');
+    b.classList.add('text-gray-400');
+  });
+  event.target.classList.remove('text-gray-400');
+  event.target.classList.add('text-accent','border-b-2','border-accent');
+
+  const list = document.getElementById('indList');
+  if (!list) return;
+  list.querySelectorAll('.indicator-cell').forEach(c=>{
+    c.style.display = (cat==='All' || c.dataset.cat===cat) ? '' : 'none';
+  });
+}
+
+// ============================================================
+//  TAB INITIALIZATIONS (Chart.js setup)
+// ============================================================
+function initTabScripts(tab) {
+  setTimeout(()=>{
+    try {
+      // Home chart
+      const hc = document.getElementById('homeChart');
+      if (hc) drawCandleChart(hc, generateCandles(80, 290, 305, 'bull'));
+
+      // All-in-one chart
+      const aio = document.getElementById('aioChart');
+      if (aio) drawCandleChart(aio, generateCandles(120, 390, 405, 'bull'));
+
+      // Pro Charts (main feature)
+      const pc = document.getElementById('proChart');
+      if (pc) drawProChart(pc);
+
+      // AI chart
+      const ai = document.getElementById('aiChart');
+      if (ai) drawCandleChart(ai, generateCandles(80, 290, 300, 'bull'));
+
+      // Multi-chart
+      [0,1,2,3].forEach(i=>{
+        const c = document.getElementById('mc'+i);
+        if (c) drawCandleChart(c, generateCandles(50, 200+i*50, 300+i*50, 'bull'), 0.5);
+      });
+
+      // Symbol chart
+      const sc = document.getElementById('symChart');
+      if (sc) drawCandleChart(sc, generateCandles(80, 290, 300, 'bull'));
+
+      // Backtest equity curve
+      const bt = document.getElementById('btChart');
+      if (bt) drawEquityCurve(bt);
+
+      // Signal performance
+      const sig = document.getElementById('sigChart');
+      if (sig) drawSignalChart(sig);
+
+      // Fear & Greed gauge (crypto dashboard)
+      const fg = document.getElementById('fgGauge');
+      if (fg) drawGauge(fg, 12, 'fear');
+
+      // Dominance gauge
+      const dom = document.getElementById('domGauge');
+      if (dom) drawGauge(dom, 62.4, 'dominance');
+
+      // Alt season gauge
+      const alt = document.getElementById('altGauge');
+      if (alt) drawGauge(alt, 59, 'alt');
+
+      // On-chain F&G
+      const ofg = document.getElementById('onchainFG');
+      if (ofg) drawGauge(ofg, 12, 'fear');
+
+      // Alt season chart
+      const ac = document.getElementById('altChart');
+      if (ac) drawAltSeasonChart(ac);
+    } catch(e) { console.error('init error', e); }
+  }, 50);
+}
+
+// ============================================================
+//  CANVAS DRAWING UTILITIES
+// ============================================================
+function setupHiDPI(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx._cssW = rect.width;
+  ctx._cssH = rect.height;
+  return {ctx, w: rect.width, h: rect.height};
+}
+
+function generateCandles(n, low, high, dir) {
+  const out = [];
+  let price = low + (high-low)*0.5;
+  for (let i = 0; i < n; i++) {
+    const trend = dir==='bull' ? i/n*0.6 : dir==='bear' ? -i/n*0.6 : Math.sin(i/4)*0.2;
+    const open = price + (Math.random()-0.5)*(high-low)*0.1;
+    const close = price + trend*(high-low)*0.3 + (Math.random()-0.5)*(high-low)*0.08;
+    const cMax = Math.max(open, close) + Math.random()*(high-low)*0.04;
+    const cMin = Math.min(open, close) - Math.random()*(high-low)*0.04;
+    out.push({o:open, c:close, h:cMax, l:cMin});
+    price = close;
+  }
+  return out;
+}
+
+function drawCandleChart(canvas, candles, heightFactor=1) {
+  const {ctx, w, h} = setupHiDPI(canvas);
+  if (!ctx) return;
+  const padding = {top:20, right:60, bottom:30, left:10};
+  const chartW = w - padding.left - padding.right;
+  const chartH = h - padding.top - padding.bottom;
+
+  const max = Math.max(...candles.map(c=>c.h));
+  const min = Math.min(...candles.map(c=>c.l));
+  const range = max - min || 1;
+  const cw = chartW / candles.length;
+
+  // Background grid
+  ctx.strokeStyle = '#1f2330';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    const y = padding.top + (chartH/5)*i;
+    ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(w-padding.right, y); ctx.stroke();
+  }
+
+  // Right-side price scale
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'left';
+  for (let i = 0; i < 5; i++) {
+    const p = max - (range/5)*i;
+    const y = padding.top + (chartH/5)*i;
+    ctx.fillText(p.toFixed(2), w - padding.right + 4, y + 4);
+  }
+
+  // Candles
+  candles.forEach((c,i)=>{
+    const x = padding.left + i*cw + cw/2;
+    const yO = padding.top + (1-(c.o-min)/range)*chartH;
+    const yC = padding.top + (1-(c.c-min)/range)*chartH;
+    const yH = padding.top + (1-(c.h-min)/range)*chartH;
+    const yL = padding.top + (1-(c.l-min)/range)*chartH;
+    const bullish = c.c >= c.o;
+    const color = bullish ? '#10b981' : '#ef4444';
+
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, yH); ctx.lineTo(x, yL); ctx.stroke();
+
+    const bodyTop = Math.min(yO, yC);
+    const bodyH = Math.max(Math.abs(yC-yO), 1);
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(x - cw*0.35, bodyTop, cw*0.7, bodyH);
+    ctx.globalAlpha = 1;
+  });
+
+  // Live badge (top right)
+  ctx.fillStyle = 'rgba(16,185,129,0.15)';
+  ctx.fillRect(w - 120, 4, 110, 18);
+  ctx.fillStyle = '#10b981';
+  ctx.font = 'bold 9px Inter';
+  ctx.textAlign = 'center';
+  ctx.fillText('● LIVE · MARKET OPEN', w - 65, 16);
+}
+
+function drawProChart(canvas) {
+  const {ctx, w, h} = setupHiDPI(canvas);
+  if (!ctx) return;
+
+  const candles = generateCandles(140, 270, 310, 'bull');
+  const padding = {top:30, right:70, bottom:30, left:10};
+  const chartW = w - padding.left - padding.right;
+  const chartH = h*0.7 - padding.top - padding.bottom;
+  const rsiH = h*0.25;
+
+  const max = Math.max(...candles.map(c=>c.h));
+  const min = Math.min(...candles.map(c=>c.l));
+  const range = max - min || 1;
+  const cw = chartW / candles.length;
+
+  // Grid
+  ctx.strokeStyle = '#1f2330';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 6; i++) {
+    const y = padding.top + (chartH/6)*i;
+    ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(w-padding.right, y); ctx.stroke();
+  }
+
+  // EMA 20 (purple line)
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  candles.forEach((c,i)=>{
+    const avg = candles.slice(Math.max(0,i-19),i+1).reduce((s,x)=>s+x.c,0)/Math.min(20,i+1);
+    const x = padding.left + i*cw + cw/2;
+    const y = padding.top + (1-(avg-min)/range)*chartH;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // EMA 50 (blue)
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  candles.forEach((c,i)=>{
+    const avg = candles.slice(Math.max(0,i-49),i+1).reduce((s,x)=>s+x.c,0)/Math.min(50,i+1);
+    const x = padding.left + i*cw + cw/2;
+    const y = padding.top + (1-(avg-min)/range)*chartH;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // VWAP (orange)
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath();
+  candles.forEach((c,i)=>{
+    const vwap = candles.slice(0,i+1).reduce((s,x)=>s+(x.h+x.l+x.c)/3*x.v||1,0)/Math.max(1,candles.slice(0,i+1).reduce((s,x)=>s+x.v||1,0));
+    const x = padding.left + i*cw + cw/2;
+    const y = padding.top + (1-(vwap-min)/range)*chartH;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Candles (last)
+  candles.forEach((c,i)=>{
+    const x = padding.left + i*cw + cw/2;
+    const yO = padding.top + (1-(c.o-min)/range)*chartH;
+    const yC = padding.top + (1-(c.c-min)/range)*chartH;
+    const yH = padding.top + (1-(c.h-min)/range)*chartH;
+    const yL = padding.top + (1-(c.l-min)/range)*chartH;
+    const bullish = c.c >= c.o;
+    ctx.strokeStyle = bullish ? '#10b981' : '#ef4444';
+    ctx.fillStyle = bullish ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.7)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(x,yH); ctx.lineTo(x,yL); ctx.stroke();
+    const bH = Math.max(Math.abs(yC-yO),1);
+    ctx.fillRect(x-cw*0.3, Math.min(yO,yC), cw*0.6, bH);
+  });
+
+  // RSI panel (bottom)
+  const rsiTop = h - rsiH - padding.bottom;
+  ctx.strokeStyle = '#1f2330';
+  ctx.beginPath(); ctx.moveTo(padding.left, rsiTop); ctx.lineTo(w-padding.right, rsiTop); ctx.stroke();
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '9px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('RSI(14)', padding.left + 4, rsiTop + 14);
+
+  // RSI line
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  candles.forEach((c,i)=>{
+    const rsi = 50 + (c.c - candles[Math.max(0,i-13)].c) * 20;
+    const x = padding.left + i*cw + cw/2;
+    const y = rsiTop + 14 + (1-(Math.min(100,Math.max(0,rsi)))/100) * (rsiH-30);
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // 70 / 30 lines
+  ctx.strokeStyle = '#ef4444'; ctx.setLineDash([2,4]);
+  ctx.beginPath(); ctx.moveTo(padding.left, rsiTop+14+rsiH*0.3); ctx.lineTo(w-padding.right, rsiTop+14+rsiH*0.3); ctx.stroke();
+  ctx.strokeStyle = '#10b981';
+  ctx.beginPath(); ctx.moveTo(padding.left, rsiTop+14+rsiH*0.7); ctx.lineTo(w-padding.right, rsiTop+14+rsiH*0.7); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Right price scale
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'left';
+  for (let i = 0; i < 6; i++) {
+    const p = max - (range/6)*i;
+    const y = padding.top + (chartH/6)*i;
+    ctx.fillText(p.toFixed(2), w - padding.right + 4, y + 4);
+  }
+}
+
+function drawEquityChart(canvas) { /* legacy */ }
+function drawEquityCurve(canvas) {
+  const {ctx, w, h} = setupHiDPI(canvas);
+  if (!ctx) return;
+  const data = [];
+  let v = 100000;
+  for (let i = 0; i < 250; i++) {
+    v += (Math.random()-0.42) * 800;
+    data.push(v);
+  }
+  const padding = {top:20, right:60, bottom:30, left:10};
+  const chartW = w - padding.left - padding.right;
+  const chartH = h - padding.top - padding.bottom;
+  const max = Math.max(...data), min = Math.min(...data), range = max-min || 1;
+
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  data.forEach((v,i)=>{
+    const x = padding.left + (i/(data.length-1))*chartW;
+    const y = padding.top + (1-(v-min)/range)*chartH;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // Fill
+  ctx.lineTo(padding.left+chartW, padding.top+chartH);
+  ctx.lineTo(padding.left, padding.top+chartH);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(139,92,246,0.15)';
+  ctx.fill();
+}
+
+function drawSignalChart(canvas) {
+  const {ctx, w, h} = setupHiDPI(canvas);
+  if (!ctx) return;
+  const setups = ['Trend','VWAP','Reversal','Breakout','Squeeze','Mean Rev'];
+  const wins = [68,72,55,76,62,58];
+  const padding = {top:20, right:60, bottom:40, left:10};
+  const chartW = w - padding.left - padding.right;
+  const chartH = h - padding.top - padding.bottom;
+  const bw = chartW / setups.length;
+
+  wins.forEach((wins,i)=>{
+    const x = padding.left + i*bw + bw*0.2;
+    const yH = (wins/100)*chartH;
+    const col = wins>=70?'#10b981':wins>=60?'#8b5cf6':'#ef4444';
+    ctx.fillStyle = col;
+    ctx.fillRect(x, padding.top+chartH-yH, bw*0.6, yH);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText(wins+'%', x + bw*0.3, padding.top+chartH-yH-5);
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '10px Inter';
+    ctx.fillText(setups[i], x + bw*0.3, padding.top+chartH+14);
+  });
+}
+
+function drawAltSeasonChart(canvas) {
+  const {ctx, w, h} = setupHiDPI(canvas);
+  if (!ctx) return;
+  const days = 90;
+  const btc = [], alts = [];
+  let bv = 100, av = 100;
+  for (let i = 0; i < days; i++) {
+    bv += (Math.random()-0.45)*1.2;
+    av += (Math.random()-0.42)*1.5;
+    btc.push(bv); alts.push(av);
+  }
+  const padding = {top:20, right:60, bottom:30, left:10};
+  const chartW = w - padding.left - padding.right;
+  const chartH = h - padding.top - padding.bottom;
+  const max = Math.max(...btc,...alts), min = Math.min(...btc,...alts), range = max-min || 1;
+
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  btc.forEach((v,i)=>{
+    const x = padding.left + (i/(days-1))*chartW;
+    const y = padding.top + (1-(v-min)/range)*chartH;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  alts.forEach((v,i)=>{
+    const x = padding.left + (i/(days-1))*chartW;
+    const y = padding.top + (1-(v-min)/range)*chartH;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Legend
+  ctx.fillStyle = '#f59e0b'; ctx.fillRect(padding.left+10, padding.top+10, 12, 3);
+  ctx.fillStyle = '#9ca3af'; ctx.font = '10px Inter'; ctx.textAlign = 'left'; ctx.fillText('BTC', padding.left+28, padding.top+14);
+  ctx.fillStyle = '#8b5cf6'; ctx.fillRect(padding.left+60, padding.top+10, 12, 3);
+  ctx.fillText('Alts', padding.left+78, padding.top+14);
+}
+
+function drawGauge(canvas, value, type) {
+  const {ctx, w, h} = setupHiDPI(canvas);
+  if (!ctx) return;
+
+  const cx = w/2, cy = h*0.85;
+  const radius = Math.min(w*0.4, h*0.7);
+
+  // Arc background
+  ctx.lineWidth = 16;
+  ctx.strokeStyle = '#1f2330';
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, Math.PI, 0);
+  ctx.stroke();
+
+  // Colored zones
+  let zones;
+  if (type==='fear') {
+    zones = [
+      {from:0, to:25, color:'#10b981'},
+      {from:25, to:45, color:'#34d399'},
+      {from:45, to:55, color:'#9ca3af'},
+      {from:55, to:75, color:'#f87171'},
+      {from:75, to:100, color:'#ef4444'}
+    ];
+  } else if (type==='dominance') {
+    zones = [
+      {from:0, to:40, color:'#ef4444'},
+      {from:40, to:50, color:'#f59e0b'},
+      {from:50, to:70, color:'#8b5cf6'},
+      {from:70, to:100, color:'#10b981'}
+    ];
+  } else { // alt
+    zones = [
+      {from:0, to:25, color:'#f59e0b'},
+      {from:25, to:50, color:'#9ca3af'},
+      {from:50, to:75, color:'#8b5cf6'},
+      {from:75, to:100, color:'#10b981'}
+    ];
+  }
+
+  zones.forEach(z=>{
+    const startA = Math.PI + (z.from/100)*Math.PI;
+    const endA = Math.PI + (z.to/100)*Math.PI;
+    ctx.strokeStyle = z.color;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, startA, endA);
+    ctx.stroke();
+  });
+
+  // Needle
+  const needleAngle = Math.PI + (value/100)*Math.PI;
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + Math.cos(needleAngle)*radius*0.85, cy + Math.sin(needleAngle)*radius*0.85);
+  ctx.stroke();
+
+  // Hub
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 6, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#8b5cf6';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3, 0, Math.PI*2);
+  ctx.fill();
+
+  // Value labels
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = '9px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('0', cx - radius + 4, cy + 14);
+  ctx.fillText('100', cx + radius - 4, cy + 14);
+  ctx.fillText('50', cx, cy - 4);
+}
+
+// ============================================================
+//  ACTIONS
+// ============================================================
+function paperTrade(action, qty) {
+  playBeep(action==='BUY'?1000:500, 100);
+  alert(`Paper ${action}: ${qty} shares of ${globalTicker} executed @ market`);
+}
+
+function captureChart() {
+  alert('Chart screenshot captured! Saved to downloads.');
+  playBeep(1200, 50);
+}
+
+function openProChartFullscreen() {
+  alert('Fullscreen mode activated.');
+}
+
+function recalcFib() {
+  const h = parseFloat(document.getElementById('fh').value);
+  const l = parseFloat(document.getElementById('fl').value);
+  const c = parseFloat(document.getElementById('fc').value);
+  const diff = h - l;
+  const pp = (h+l+c)/3;
+  const results = [
+    ['100% (High)', h.toFixed(2)],
+    ['78.6%', (l + diff*0.786).toFixed(2)],
+    ['61.8% (Golden)', (l + diff*0.618).toFixed(2)],
+    ['50%', (l + diff*0.5).toFixed(2)],
+    ['38.2%', (l + diff*0.382).toFixed(2)],
+    ['23.6%', (l + diff*0.236).toFixed(2)],
+    ['0% (Low)', l.toFixed(2)],
+    ['Pivot Point (PP)', pp.toFixed(2)],
+    ['R1', (2*pp-l).toFixed(2)],
+    ['S1', (2*pp-h).toFixed(2)],
+  ];
+  document.getElementById('fibResults').innerHTML = results.map(([n,v])=>`
+    <div class="card text-center">
+      <div class="text-[10px] text-gray-500 uppercase font-bold">${n}</div>
+      <div class="text-lg font-black font-mono mt-1">$${v}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+//  AUDIO & UTILITIES
+// ============================================================
+function playBeep(freq, dur) {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    gain.gain.value = 0.05;
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur/1000);
+    osc.stop(ctx.currentTime + dur/1000);
+  } catch(e) {}
+}
+
+// ============================================================
+//  BOOT
+// ============================================================
+renderActiveTab();
+recalcFib();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
